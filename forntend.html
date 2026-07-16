@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Lost & Found Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="forntend.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<body>
+   <!-- Login Page -->
+    <div id="login-page" class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card auth-card">
+                        <div class="auth-header">
+                            <h2><i class="fas fa-search me-2"></i>Digital Lost & Found</h2>
+                            <p class="mt-2">Sign in to your account</p>
+                        </div>
+                        <div class="auth-body">
+                            <form id="login-form">
+                                <div class="mb-3">
+                                    <label for="login-email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="login-email" placeholder="Enter your email" required>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="login-password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="login-password" placeholder="Enter your password" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-0">Don't have an account? <a href="#" id="show-register" class="text-primary fw-bold">Register Now</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="auth-container hidden">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card auth-card">
+                        <div class="auth-header">
+                            <h2><i class="fas fa-user-plus me-2"></i>Create Account</h2>
+                            <p class="mt-2">Register for a new account</p>
+                        </div>
+                        <div class="auth-body">
+                            <form id="register-form">
+                                <div class="mb-3">
+                                    <label for="register-name" class="form-label">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="register-name" placeholder="Enter your full name" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="register-email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="register-email" placeholder="Enter your email" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="register-password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="register-password" placeholder="Create a password" required>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-0">Already have an account? <a href="#" id="show-login" class="text-primary fw-bold">Sign In</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div id="dashboard-container" class="dashboard-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-search"></i>
+                    <span class="brand-name">Lost & Found</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="report-lost">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Report Lost Item</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="report-found">
+                        <i class="fas fa-plus-square"></i>
+                        <span>Report Found Item</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="search-items">
+                        <i class="fas fa-search"></i>
+                        <span>Search Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+                <li class="sidebar-item admin-item hidden">
+                    <a href="#" class="sidebar-link" data-page="admin-panel">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </li>
+                <li class="sidebar-item mt-4">
+                    <a href="#" class="sidebar-link text-danger" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="topbar">
+                <div class="logo d-lg-none">Lost & Found System</div>
+                <div class="user-profile">
+                    <div class="user-avatar">DK</div>
+                    <div class="user-info d-none d-lg-block">
+                        <div class="fw-bold">Darshak Khedekar</div>
+                        <div class="text-muted small">darshakkhedekar@gamil.com</div>
+                    </div>
+                    <button class="sidebar-toggle d-lg-none ms-2" id="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <h1 class="page-title"><i class="fas fa-home"></i> Dashboard</h1>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-title">TOTAL REPORTS</div>
+                        <div class="stat-value">42</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-title">ITEMS RETURNED</div>
+                        <div class="stat-value">18</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-title">PENDING MATCHES</div>
+                        <div class="stat-value">7</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-title">UNCLAIMED ITEMS</div>
+                        <div class="stat-value">17</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="form-section">
+                            <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Quick Report Lost Item</h2>
+                            <form id="quick-lost-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Item Name</label>
+                                    <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Location Lost</label>
+                                    <input type="text" class="form-control" placeholder="e.g., Library, Cafeteria, Main Building" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" rows="3" placeholder="Brief description of the item"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Report Lost Item</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="form-section">
+                            <h2 class="form-title"><i class="fas fa-plus-square me-2"></i>Quick Report Found Item</h2>
+                            <form id="quick-found-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Item Name</label>
+                                    <input type="text" class="form-control" placeholder="e.g., Backpack, Water Bottle, ID Card" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Location Found</label>
+                                    <input type="text" class="form-control" placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" rows="3" placeholder="Brief description of the item"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Report Found Item</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-wallet fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-lost">LOST</span>
+                                    <h3 class="item-title">Leather Wallet</h3>
+                                    <p class="item-description">Lost near the library on May 15th.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Main Library</span>
+                                        <span><i class="fas fa-clock me-1"></i> 2 days ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-headphones fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-found">LOST</span>
+                                    <h3 class="item-title">Wireless Headphones</h3>
+                                    <p class="item-description">Lost in the cafeteria on May 17th. </p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Student Cafeteria</span>
+                                        <span><i class="fas fa-clock me-1"></i> 1 day ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-laptop fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-lost">LOST</span>
+                                    <h3 class="item-title">MacBook Pro</h3>
+                                    <p class="item-description">Lost in computer lab on May 16th.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Computer Science Building</span>
+                                        <span><i class="fas fa-clock me-1"></i> 2 days ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Lost Item Page -->
+            <div id="report-lost-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-plus-circle"></i> Report Lost Item</h1>
+                <div class="form-section">
+                    <form id="lost-item-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Item Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Select category</option>
+                                    <option>Electronics</option>
+                                    <option>Accessories</option>
+                                    <option>Documents</option>
+                                    <option>Clothing</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date Lost <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Lost <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g., Library, Cafeteria, Main Building" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" placeholder="Detailed description of the item including color, brand, distinguishing features, etc." required></textarea>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Item Image</label>
+                                <input type="file" class="form-control" id="lostItemImage" accept="image/*">
+                                <div class="form-text">Upload a clear photo of the item if available</div>
+                                <div class="image-preview-container">
+                                    <img id="lostImagePreview" class="image-preview" alt="Item preview">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                            <button type="button" class="btn btn-outline-secondary" id="cancel-lost-report">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Report Found Item Page -->
+            <div id="report-found-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-plus-square"></i> Report Found Item</h1>
+                <div class="form-section">
+                    <form id="found-item-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Item Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g., Backpack, Water Bottle, ID Card" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Select category</option>
+                                    <option>Electronics</option>
+                                    <option>Accessories</option>
+                                    <option>Documents</option>
+                                    <option>Clothing</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date Found <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Found <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" placeholder="Detailed description of the item including color, brand, distinguishing features, etc." required></textarea>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Item Image</label>
+                                <input type="file" class="form-control" id="foundItemImage" accept="image/*">
+                                <div class="form-text">Upload a clear photo of the item</div>
+                                <div class="image-preview-container">
+                                    <img id="foundImagePreview" class="image-preview" alt="Item preview">
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="contactInfoCheck" required>
+                                    <label class="form-check-label" for="contactInfoCheck">
+                                        I agree to provide my contact information for verification purposes
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                            <button type="button" class="btn btn-outline-secondary" id="cancel-found-report">Cancel</button>
+                            <button type="submit" class="btn btn-success">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Items Page -->
+            <div id="search-items-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-search"></i> Search Lost & Found Items</h1>
+                
+                <div class="search-container">
+                    <div class="mb-4">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by item name, description, location...">
+                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option>All Categories</option>
+                                <option>Electronics</option>
+                                <option>Accessories</option>
+                                <option>Documents</option>
+                                <option>Clothing</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option>All Statuses</option>
+                                <option>Lost</option>
+                                <option>Found</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="dateFilter">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 3 months</option>
+                                <option>All time</option>
+                            </select>
+                        </div>
+                        <div class="filter-group d-flex align-items-end">
+                            <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                                <i class="fas fa-redo me-1"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2 class="form-title mb-4">Search Results (8)</h2>
+                    <div class="row" id="searchResults">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-id-card fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-found">LOST</span>
+                                    <h3 class="item-title">Student ID Card</h3>
+                                    <p class="item-description">Found near the student center fountain on May 18th. ID belongs to a student from the Engineering department.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Student Center</span>
+                                        <span><i class="fas fa-clock me-1"></i> 12 hours ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-key fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-lost">LOST</span>
+                                    <h3 class="item-title">Keychain with 3 Keys</h3>
+                                    <p class="item-description">Lost between the science building and parking lot on May 17th. Has a blue rubber keychain with university logo.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Science Building</span>
+                                        <span><i class="fas fa-clock me-1"></i> 1 day ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-book fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-found">LOSt</span>
+                                    <h3 class="item-title">Textbook: Calculus III</h3>
+                                    <p class="item-description">Found in room 305 of the math building on May 16th. Has name "Alex Johnson" written inside cover.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> Math Building</span>
+                                        <span><i class="fas fa-clock me-1"></i> 2 days ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="item-card">
+                                <div class="item-image">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                        <i class="fas fa-glasses fa-3x"></i>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-category category-lost">LOST</span>
+                                    <h3 class="item-title">Prescription Glasses</h3>
+                                    <p class="item-description">Lost in the library study area on May 15th. Black rectangular frames with blue light filter.</p>
+                                    <div class="item-meta">
+                                        <span><i class="fas fa-map-marker-alt me-1"></i> University Library</span>
+                                        <span><i class="fas fa-clock me-1"></i> 3 days ago</span>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-user"></i> My Profile</h1>
+                
+                <div class="profile-header">
+                    <div class="profile-avatar">DK</div>
+                    <h2 class="profile-name">Darshak Khedekar</h2>
+                    <p class="profile-email">darshak.khedekar@gamil.com</p>
+                    <span class="badge bg-primary">Student</span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-section">
+                            <h2 class="form-title"><i class="fas fa-user-edit me-2"></i>Personal Information</h2>
+                            <form id="profile-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" value="Darshak" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" value="Khedekar" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" value="darshak.khedekar@gamil.com" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" value="8169111518">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Student ID</label>
+                                        <input type="text" class="form-control" value="FS24CO048" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Department</label>
+                                        <input type="text" class="form-control" value="Computer Science" disabled>
+                                    </div>
+                                </div>
+                                <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="form-section mt-4">
+                            <h2 class="form-title"><i class="fas fa-key me-2"></i>Change Password</h2>
+                            <form id="password-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-section">
+                            <h2 class="form-title"><i class="fas fa-shield-alt me-2"></i>Account Status</h2>
+                            <div class="text-center py-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-check-circle text-success fa-3x"></i>
+                                </div>
+                                <h4 class="mb-3">Account in Good Standing</h4>
+                                <p class="text-muted mb-4">Your account is active and in good standing with the university.</p>
+                                <div class="d-grid">
+                                    <button class="btn btn-outline-primary">View Account History</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section mt-4">
+                            <h2 class="form-title"><i class="fas fa-history me-2"></i>Recent Activity</h2>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">Reported Lost Item</div>
+                                        Brown Leather Wallet
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">2 days ago</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">Searched Items</div>
+                                        Student ID Cards
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">3 days ago</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">Updated Profile</div>
+                                        Personal Information
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">1 week ago</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Page -->
+            <div id="admin-panel-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-title">TOTAL USERS</div>
+                        <div class="stat-value">156</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-title">TOTAL REPORTS</div>
+                        <div class="stat-value">287</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-title">ITEMS RETURNED</div>
+                        <div class="stat-value">94</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-title">PENDING VERIFICATION</div>
+                        <div class="stat-value">23</div>
+                    </div>
+                </div>
+                
+                <div class="admin-table-container">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">User Management</h2>
+                        <button class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i> Add User</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#S12345678</td>
+                                    <td>John Smith</td>
+                                    <td>john.smith@example.com</td>
+                                    <td>Student</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-ban"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#S87654321</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>sarah.j@example.com</td>
+                                    <td>Student</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-ban"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#F24681357</td>
+                                    <td>Michael Chen</td>
+                                    <td>m.chen@example.com</td>
+                                    <td>Faculty</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-ban"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#S13579246</td>
+                                    <td>Alex Rodriguez</td>
+                                    <td>alex.r@example.com</td>
+                                    <td>Student</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#A97531246</td>
+                                    <td>Jessica Williams</td>
+                                    <td>j.williams@example.com</td>
+                                    <td>Admin</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-ban"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="admin-table-container mt-4">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">Report Management</h2>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary active">All Reports</button>
+                            <button class="btn btn-outline-primary">Lost Items</button>
+                            <button class="btn btn-outline-primary">Found Items</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>Item Name</th>
+                                    <th>Type</th>
+                                    <th>Reported By</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#R98765</td>
+                                    <td>Brown Leather Wallet</td>
+                                    <td><span class="badge bg-danger">Lost</span></td>
+                                    <td>John Smith</td>
+                                    <td>May 15, 2023</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#R87654</td>
+                                    <td>Wireless Headphones</td>
+                                    <td><span class="badge bg-success">Found</span></td>
+                                    <td>Sarah Johnson</td>
+                                    <td>May 17, 2023</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#R76543</td>
+                                    <td>Student ID Card</td>
+                                    <td><span class="badge bg-success">Found</span></td>
+                                    <td>Michael Chen</td>
+                                    <td>May 18, 2023</td>
+                                    <td><span class="status-badge status-pending">Pending</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#R65432</td>
+                                    <td>MacBook Pro</td>
+                                    <td><span class="badge bg-danger">Lost</span></td>
+                                    <td>Alex Rodriguez</td>
+                                    <td>May 16, 2023</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#R54321</td>
+                                    <td>Textbook: Calculus III</td>
+                                    <td><span class="badge bg-success">Found</span></td>
+                                    <td>Jessica Williams</td>
+                                    <td>May 16, 2023</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+</body>
+<script src="backed.js"></script>
+</html>
