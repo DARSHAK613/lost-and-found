@@ -126,6 +126,35 @@ def update_profile():
 
     })
 
+@app.route("/change-password", methods=["PUT"])
+def change_password():
+
+    data = request.json
+
+    email = data.get("email")
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    user = users.find_one({"email": email})
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    if user["password"] != current_password:
+        return jsonify({"message": "Current password is incorrect"}), 400
+
+    users.update_one(
+        {"email": email},
+        {
+            "$set": {
+                "password": new_password
+            }
+        }
+    )
+
+    return jsonify({
+        "message": "Password changed successfully"
+    })
 @app.route("/found-item", methods=["POST"])
 def found_item():
 
@@ -255,7 +284,7 @@ def recent_lost_items():
 
     items = []
 
-    for item in lost_items.find().sort("_id", -1).limit(5):
+    for item in lost_items.find().sort("_id", -1):
 
         items.append({
 
