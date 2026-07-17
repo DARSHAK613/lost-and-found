@@ -234,154 +234,97 @@
 
                 <div class="stats-container">
                     <div class="stat-card">
-                        <div class="stat-icon primary">
+
+                        <div class="stat-icon found">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM FOUND</div>
+                        <div class="stat-value" id="total-found-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon lost">
                             <i class="fas fa-search"></i>
                         </div>
-                        <div class="stat-title">TOTAL REPORTS</div>
-                        <div class="stat-value">42</div>
+                        <div class="stat-title">TOTAL ITEM LOSS</div>
+                        <div class="stat-value" id="total-lost-items">0</div>
                     </div>
+
                     <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-check-circle"></i>
+                        <div class="stat-icon returned">
+                            <i class="fas fa-handshake"></i>
                         </div>
-                        <div class="stat-title">ITEMS RETURNED</div>
-                        <div class="stat-value">18</div>
+                        <div class="stat-title">TOTAL ITEM RETURNED</div>
+                        <div class="stat-value">0</div>
                     </div>
+
                     <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-title">PENDING MATCHES</div>
-                        <div class="stat-value">7</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon danger">
-                            <i class="fas fa-times-circle"></i>
+                        <div class="stat-icon unclaimed">
+                            <i class="fas fa-boxes-stacked"></i>
                         </div>
                         <div class="stat-title">UNCLAIMED ITEMS</div>
-                        <div class="stat-value">17</div>
+                        <div class="stat-value">0</div>
                     </div>
+
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <div class="form-section">
                             <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Quick Report Lost Item</h2>
+
                             <form id="quick-lost-form">
                                 <div class="mb-3">
                                     <label class="form-label">Item Name</label>
                                     <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone"
-                                        required>
+                                        required id="quick-lost-name">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Location Lost</label>
-                                    <input type="text" class="form-control"
+                                    <input type="text" class="form-control" id="quick-lost-location"
                                         placeholder="e.g., Library, Cafeteria, Main Building" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Description</label>
-                                    <textarea class="form-control" rows="3"
+                                    <textarea class="form-control" rows="3" id="quick-lost-description"
                                         placeholder="Brief description of the item"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100">Report Lost Item</button>
                             </form>
+
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="form-section">
                             <h2 class="form-title"><i class="fas fa-plus-square me-2"></i>Quick Report Found Item</h2>
+
                             <form id="quick-found-form">
                                 <div class="mb-3">
                                     <label class="form-label">Item Name</label>
-                                    <input type="text" class="form-control"
+                                    <input type="text" class="form-control" id="quick-found-name"
                                         placeholder="e.g., Backpack, Water Bottle, ID Card" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Location Found</label>
-                                    <input type="text" class="form-control"
+                                    <input type="text" class="form-control" id="quick-found-location"
                                         placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Description</label>
-                                    <textarea class="form-control" rows="3"
+                                    <textarea class="form-control" rows="3" id="quick-found-description"
                                         placeholder="Brief description of the item"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-success w-100">Report Found Item</button>
                             </form>
+
                         </div>
                     </div>
                 </div>
 
                 <div class="form-section">
                     <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="item-card">
-                                <div class="item-image">
-                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                        <i class="fas fa-wallet fa-3x"></i>
-                                    </div>
-                                </div>
-                                <div class="item-details">
-                                    <span class="item-category category-lost">LOST</span>
-                                    <h3 class="item-title">Leather Wallet</h3>
-                                    <p class="item-description">Lost near the library on May 15th.</p>
-                                    <div class="item-meta">
-                                        <span><i class="fas fa-map-marker-alt me-1"></i> Main Library</span>
-                                        <span><i class="fas fa-clock me-1"></i> 2 days ago</span>
-                                    </div>
-                                    <div class="item-actions">
-                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
-                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <div class="item-card">
-                                <div class="item-image">
-                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                        <i class="fas fa-headphones fa-3x"></i>
-                                    </div>
-                                </div>
-                                <div class="item-details">
-                                    <span class="item-category category-found">LOST</span>
-                                    <h3 class="item-title">Wireless Headphones</h3>
-                                    <p class="item-description">Lost in the cafeteria on May 17th. </p>
-                                    <div class="item-meta">
-                                        <span><i class="fas fa-map-marker-alt me-1"></i> Student Cafeteria</span>
-                                        <span><i class="fas fa-clock me-1"></i> 1 day ago</span>
-                                    </div>
-                                    <div class="item-actions">
-                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
-                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4">
-                            <div class="item-card">
-                                <div class="item-image">
-                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                                        <i class="fas fa-laptop fa-3x"></i>
-                                    </div>
-                                </div>
-                                <div class="item-details">
-                                    <span class="item-category category-lost">LOST</span>
-                                    <h3 class="item-title">MacBook Pro</h3>
-                                    <p class="item-description">Lost in computer lab on May 16th.</p>
-                                    <div class="item-meta">
-                                        <span><i class="fas fa-map-marker-alt me-1"></i> Computer Science
-                                            Building</span>
-                                        <span><i class="fas fa-clock me-1"></i> 2 days ago</span>
-                                    </div>
-                                    <div class="item-actions">
-                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
-                                        <button class="btn btn-sm btn-outline-danger">Mark as Found</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row" id="recent-lost-items-container">
+
                     </div>
                 </div>
             </div>
@@ -392,14 +335,16 @@
                 <div class="form-section">
                     <form id="lost-item-form">
                         <div class="row">
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Item Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone"
-                                    required>
+                                <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone" required
+                                    id="lost-item-name">
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Category <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
+                                <select class="form-select" required id="lost-category">
                                     <option value="">Select category</option>
                                     <option>Electronics</option>
                                     <option>Accessories</option>
@@ -408,20 +353,23 @@
                                     <option>Other</option>
                                 </select>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date Lost <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" required>
+                                <input type="date" class="form-control" required id="lost-date">
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Location Lost <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control"
-                                    placeholder="e.g., Library, Cafeteria, Main Building" required>
+                                    placeholder="e.g., Library, Cafeteria, Main Building" required id="lost-location">
                             </div>
+
                             <div class="col-12 mb-3">
                                 <label class="form-label">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" rows="4"
                                     placeholder="Detailed description of the item including color, brand, distinguishing features, etc."
-                                    required></textarea>
+                                    required id="lost-description"></textarea>
                             </div>
                             <div class="col-12 mb-3">
                                 <label class="form-label">Item Image</label>
@@ -448,13 +396,15 @@
                     <form id="found-item-form">
                         <div class="row">
                             <div class="col-md-6 mb-3">
+
                                 <label class="form-label">Item Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control"
+                                <input type="text" class="form-control" id="found-item-name"
                                     placeholder="e.g., Backpack, Water Bottle, ID Card" required>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Category <span class="text-danger">*</span></label>
-                                <select class="form-select" required>
+                                <select class="form-select" required id="found-category">
                                     <option value="">Select category</option>
                                     <option>Electronics</option>
                                     <option>Accessories</option>
@@ -463,29 +413,34 @@
                                     <option>Other</option>
                                 </select>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date Found <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" required>
+                                <input type="date" class="form-control" required id="found-date">
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Location Found <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control"
+                                <input type="text" class="form-control" id="found-location"
                                     placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
                             </div>
+
                             <div class="col-12 mb-3">
                                 <label class="form-label">Description <span class="text-danger">*</span></label>
-                                <textarea class="form-control" rows="4"
+                                <textarea class="form-control" rows="4" id="found-description"
                                     placeholder="Detailed description of the item including color, brand, distinguishing features, etc."
                                     required></textarea>
                             </div>
+
                             <div class="col-12 mb-3">
                                 <label class="form-label">Item Image</label>
-                                <input type="file" class="form-control" id="foundItemImage" accept="image/*">
+                                <input type="file" class="form-control" accept="image/*" id="foundItemImage">
                                 <div class="form-text">Upload a clear photo of the item</div>
                                 <div class="image-preview-container">
                                     <img id="foundImagePreview" class="image-preview" alt="Item preview">
                                 </div>
                             </div>
+
                             <div class="col-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="contactInfoCheck" required>
@@ -659,9 +614,9 @@
                 <h1 class="page-title"><i class="fas fa-user"></i> My Profile</h1>
 
                 <div class="profile-header">
-                    <div class="profile-avatar">DK</div>
-                    <h2 class="profile-name">Darshak Khedekar</h2>
-                    <p class="profile-email">darshak.khedekar@gamil.com</p>
+                    <div class="profile-avatar" id="profile-avatar">DK</div>
+                    <h2 class="profile-name" id="profile-name">Darshak Khedekar</h2>
+                    <p class="profile-email" id="profile-email">darshak.khedekar@gamil.com</p>
                     <span class="badge bg-primary">Student</span>
                 </div>
 
@@ -672,30 +627,38 @@
                             <form id="profile-form">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
+
                                         <label class="form-label">First Name</label>
-                                        <input type="text" class="form-control" value="Darshak" required>
+                                        <input type="text" id="profile-firstname" class="form-control" required>
                                     </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" value="Khedekar" required>
+                                        <input type="text" id="profile-lastname" class="form-control" required>
+
                                     </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Email Address</label>
-                                        <input type="email" class="form-control" value="darshak.khedekar@gamil.com"
-                                            required>
+                                        <input type="email" id="profile-email-input" class="form-control" required>
+
                                     </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Phone Number</label>
-                                        <input type="tel" class="form-control" value="8169111518">
+                                        <input type="tel" id="profile-phone" class="form-control">
                                     </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Student ID</label>
-                                        <input type="text" class="form-control" value="FS24CO048" disabled>
+                                        <input type="text" id="profile-studentid" class="form-control" disabled>
                                     </div>
+
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Department</label>
-                                        <input type="text" class="form-control" value="Computer Science" disabled>
+                                        <input type="text" id="profile-department" class="form-control" disabled>
                                     </div>
+
                                 </div>
                                 <div class="d-grid d-md-flex justify-content-md-end gap-3">
                                     <button type="button" class="btn btn-outline-secondary">Cancel</button>
