@@ -621,9 +621,9 @@ if (res.status === 200) {
 
     }
     function openFoundReport(itemName, category, location) {
-
+         console.log("openFoundReport called");
     // Open the Report Found Item page
-    showPage(reportFoundPage);   // If your project uses another function, tell me.
+    showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
 
     // Fill the form
     document.getElementById("found-item-name").value = itemName;
@@ -636,6 +636,7 @@ if (res.status === 200) {
     document.getElementById("found-date").value =
         new Date().toISOString().split("T")[0];
 }
+window.openFoundReport = openFoundReport;
     // Profile Form Submissions (Mock)
     // ---------------- UPDATE PROFILE ----------------
 
@@ -687,22 +688,81 @@ if (res.status === 200) {
 
     }
 
-    const passwordForm = document.getElementById('password-form');
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Password changed successfully!');
+    const passwordForm = document.getElementById("password-form");
+
+if (passwordForm) {
+
+    passwordForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        const currentPassword = document.getElementById("current-password").value;
+
+        const newPassword = document.getElementById("new-password").value;
+
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        if (newPassword !== confirmPassword) {
+            alert("New passwords do not match");
+            return;
+        }
+
+        const response = await fetch("http://127.0.0.1:5000/change-password", {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                email: user.email,
+
+                current_password: currentPassword,
+
+                new_password: newPassword
+
+            })
+
         });
-    }
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if (response.ok) {
+
+            passwordForm.reset();
+
+        }
+
+    });
+
+}
 
     // Initialize with login page visible
-    const user = localStorage.getItem("user");
+   const user = localStorage.getItem("user");
 
-    if (user) {
-        showPage(dashboardContainer);
-        showDashboardPage(dashboardPage);
-        loadUserProfile();
-    } else {
-        showPage(loginPage);
-    }
+if (user) {
+
+    showPage(dashboardContainer);
+
+    showDashboardPage(dashboardPage);
+
+    loadUserProfile();
+
+    loadTotalFoundItems();
+
+    loadTotalLostItems();
+
+    loadRecentLostItems();
+
+} else {
+
+    showPage(loginPage);
+
+}
 });
