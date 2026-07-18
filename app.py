@@ -1,825 +1,352 @@
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Page Navigation
-    const loginPage = document.getElementById('login-page');
-    const registerPage = document.getElementById('register-page');
-    const dashboardContainer = document.getElementById('dashboard-container');
-    const dashboardPage = document.getElementById('dashboard-page');
-    const reportLostPage = document.getElementById('report-lost-page');
-    const reportFoundPage = document.getElementById('report-found-page');
-    const searchItemsPage = document.getElementById('search-items-page');
-    const profilePage = document.getElementById('profile-page');
-    const adminPanelPage = document.getElementById('admin-panel-page');
-
-    // Sidebar elements
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    const adminItem = document.querySelector('.admin-item');
-
-    // Auth elements
-    const showRegisterLink = document.getElementById('show-register');
-    const showLoginLink = document.getElementById('show-login');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    // Form elements
-    const lostItemImage = document.getElementById('lostItemImage');
-    const lostImagePreview = document.getElementById('lostImagePreview');
-    const foundItemImage = document.getElementById('foundItemImage');
-    const foundImagePreview = document.getElementById('foundImagePreview');
-    const cancelLostReport = document.getElementById('cancel-lost-report');
-    const cancelFoundReport = document.getElementById('cancel-found-report');
-
-    // Search elements
-    const searchButton = document.getElementById('searchButton');
-    const resetFilters = document.getElementById('resetFilters');
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from pymongo import MongoClient
 
 
-    // Show admin panel if user is admin
+app = Flask(__name__)
+CORS(app)
+
+client = MongoClient("mongodb://localhost:27017/")
+db = client["lost_found"]
+users = db["users"]
+found_items = db["found_items"]
+lost_items = db["lost_items"]
+activity_logs = db["activity_logs"]
 
 
-    function loadUserProfile() {
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-        const user = JSON.parse(localStorage.getItem("user"));
+def add_activity(email, activity):
 
-        if (!user) return;
+    activity_logs.insert_one({
 
-        // Top Bar
-        document.querySelector(".user-info .fw-bold").innerText =
-            user.firstname + " " + user.lastname;
+        "email": email,
 
-        document.querySelector(".user-info .small").innerText =
-            user.email;
+        "activity": activity,
 
-        // Avatar (Top Bar)
-        document.querySelector(".user-avatar").innerText =
-            user.firstname.charAt(0).toUpperCase() +
-            user.lastname.charAt(0).toUpperCase();
+        "time": datetime.now(ZoneInfo("Asia/Kolkata"))
 
-        // Profile Page
-        document.getElementById("profile-avatar").innerText =
-            user.firstname.charAt(0).toUpperCase() +
-            user.lastname.charAt(0).toUpperCase();
+    })
 
-        document.getElementById("profile-name").innerText =
-            user.firstname + " " + user.lastname;
+@app.route("/")
+def home():
+    return "Server is running"
 
-        document.getElementById("profile-email").innerText =
-            user.email;
+@app.route("/register", methods=["POST"])
+def register():
 
-        // Form
+    data = request.json
 
-        document.getElementById("profile-firstname").value =
-            user.firstname;
+    firstname = data.get("firstname")
+    lastname = data.get("lastname")
+    email = data.get("email").strip().lower()
+    phone = data.get("phone")
+    studentid = data.get("studentid")
+    department = data.get("department")
+    password = data.get("password")
 
-        document.getElementById("profile-lastname").value =
-            user.lastname;
+    if users.find_one({"email": email}):
+        return jsonify({"message": "Email already registered"}), 400
 
-        document.getElementById("profile-email-input").value =
-            user.email;
+    users.insert_one({
+        "firstname": firstname,
+        "lastname": lastname,
+        "fullname": firstname + " " + lastname,
+        "email": email,
+        "phone": phone,
+        "studentid": studentid,
+        "department": department,
+        "password": password
+    })
 
-        document.getElementById("profile-phone").value =
-            user.phone;
-
-        document.getElementById("profile-studentid").value =
-            user.studentid;
-
-        document.getElementById("profile-department").value =
-            user.department;
-    }
-    // Page Navigation Functions
-    function showPage(pageElement) {
-
-        // Hide all pages
-        loginPage.classList.add('hidden');
-        registerPage.classList.add('hidden');
-        dashboardContainer.classList.add('hidden');
-
-        // Show requested page
-        pageElement.classList.remove('hidden');
-
-        // Close mobile menu if open
-        sidebar.classList.remove('active');
-    }
-
-    function showDashboardPage(pageElement, clickedLink) {
-        // Hide all dashboard subpages
-        dashboardPage.classList.add('hidden');
-        reportLostPage.classList.add('hidden');
-        reportFoundPage.classList.add('hidden');
-        searchItemsPage.classList.add('hidden');
-        profilePage.classList.add('hidden');
-        adminPanelPage.classList.add('hidden');
+    return jsonify({"message": "Registration Successful"})
 
 
-        // Show requested dashboard subpage
-        pageElement.classList.remove('hidden');
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
 
-        // Update sidebar active link
-        sidebarLinks.forEach(link => link.classList.remove('active'));
-        if (clickedLink) {
-            clickedLink.classList.add('active');
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "").strip()
+
+    user = users.find_one({"email": email})
+
+    if not user:
+        return jsonify({"message": "Email not found"}), 404
+
+    if str(user.get("password")) != password:
+        return jsonify({"message": "Incorrect password"}), 401
+
+    return jsonify({
+        "message": "Login successful",
+        "user": {
+            "firstname": user["firstname"],
+            "lastname": user["lastname"],
+            "fullname": user["fullname"],
+            "email": user["email"],
+            "phone": user["phone"],
+            "studentid": user["studentid"],
+            "department": user["department"]
         }
-        loadTotalFoundItems();
-    }
+    }), 200
+@app.route("/update-profile", methods=["PUT"])
+def update_profile():
 
-    // Event Listeners for Navigation
-    showRegisterLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage(registerPage);
-    });
+    data = request.json
 
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage(loginPage);
-    });
+    email = data.get("email")
 
-    logoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+    users.update_one(
 
-        localStorage.removeItem("user"); // IMPORTANT
+        {"email": email},
 
-        showPage(loginPage);
-    });
+        {
+            "$set": {
 
-    // Dashboard Navigation
-    document.querySelectorAll('[data-page]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pageId = link.getAttribute('data-page');
+                "firstname": data.get("firstname"),
 
-            switch (pageId) {
-                case 'dashboard':
-                    showDashboardPage(dashboardPage, link);
-                    break;
-                case 'report-lost':
-                    showDashboardPage(reportLostPage);
-                    break;
-                case 'report-found':
-                    showDashboardPage(reportFoundPage);
-                    break;
-                case 'search-items':
-                    showDashboardPage(searchItemsPage);
-                    break;
-                case 'profile':
-                    showDashboardPage(profilePage);
-                    break;
-                case 'admin-panel':
-                    showDashboardPage(adminPanelPage);
-                    break;
+                "lastname": data.get("lastname"),
+
+                "fullname": data.get("firstname") + " " + data.get("lastname"),
+
+                "phone": data.get("phone")
+
             }
-        });
-    });
-
-    // Login and Register Form Submission
-    // ---------------- REGISTER ----------------
-    registerForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const firstname = document.getElementById("register-firstname").value;
-        const lastname = document.getElementById("register-lastname").value;
-        const email = document.getElementById("register-email").value;
-        const phone = document.getElementById("register-phone").value;
-        const studentid = document.getElementById("register-studentid").value;
-        const department = document.getElementById("register-department").value;
-        const password = document.getElementById("register-password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
-
-        if (password !== confirmPassword) {
-            alert("Passwords do not match");
-            return;
         }
 
-        const response = await fetch("http://127.0.0.1:5000/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                firstname,
-                lastname,
-                email,
-                phone,
-                studentid,
-                department,
-                password
-            })
-        });
+    )
 
-        const data = await response.json();
+    add_activity(email, "Updated Profile")
+    updated = users.find_one({"email": email})
+    
 
-        alert(data.message);
+    return jsonify({
 
-        if (response.ok) {
-            showPage(loginPage);
+        "message": "Profile Updated",
+
+        "user": {
+
+            "firstname": updated["firstname"],
+
+            "lastname": updated["lastname"],
+
+            "fullname": updated["fullname"],
+
+            "email": updated["email"],
+
+            "phone": updated["phone"],
+
+            "studentid": updated["studentid"],
+
+            "department": updated["department"]
+
         }
-    });
 
+    })
 
-    // ---------------- LOGIN ----------------
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+@app.route("/change-password", methods=["PUT"])
+def change_password():
 
-        const email = document.querySelector("#login-email").value;
-        const password = document.querySelector("#login-password").value;
+    data = request.json
 
-        const res = await fetch("http://127.0.0.1:5000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        });
+    email = data.get("email")
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
 
-        const data = await res.json();
+    user = users.find_one({"email": email})
 
-        console.log(data);
+    if not user:
+        return jsonify({"message": "User not found"}), 404
 
-        if (res.status === 200) {
+    if user["password"] != current_password:
+        return jsonify({"message": "Current password is incorrect"}), 400
 
-            localStorage.setItem("user", JSON.stringify(data.user));
-
-            showPage(dashboardContainer);
-
-            showDashboardPage(dashboardPage);
-
-            loadUserProfile();
-            loadRecentActivities();
-
-            loadTotalFoundItems();
-            loadTotalLostItems();
-            loadRecentLostItems();
-
-        } else {
-            alert(data.message);
+    users.update_one(
+        {"email": email},
+        {
+            "$set": {
+                "password": new_password
+            }
         }
-    });
+    )
+    add_activity(email, "Changed Password")
 
+    return jsonify({
+        "message": "Password changed successfully"
+    })
+@app.route("/found-item", methods=["POST"])
+def found_item():
 
-    // Image Preview for Lost Item Form
-    lostItemImage.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                lostImagePreview.src = event.target.result;
-                lostImagePreview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        }
-    });
+    data = request.json
 
-    // Image Preview for Found Item Form
-    foundItemImage.addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                foundImagePreview.src = event.target.result;
-                foundImagePreview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        }
-    });
+    found_items.insert_one({
 
-    // Cancel Report Buttons
-    cancelLostReport.addEventListener('click', () => {
-        showDashboardPage(dashboardPage);
-        document.getElementById('lost-item-form').reset();
-        lostImagePreview.style.display = 'none';
-    });
+        "item_name": data.get("item_name"),
 
-    cancelFoundReport.addEventListener('click', () => {
-        showDashboardPage(dashboardPage);
-        document.getElementById('found-item-form').reset();
-        foundImagePreview.style.display = 'none';
-    });
+        "category": data.get("category"),
 
-    // Search Functionality
-    searchButton.addEventListener('click', () => {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        if (searchTerm) {
-            alert(`Searching for: ${searchTerm}\nIn a real application, this would filter the results.`);
-        }
-    });
+        "date_found": data.get("date_found"),
 
-    resetFilters.addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('categoryFilter').selectedIndex = 0;
-        document.getElementById('statusFilter').selectedIndex = 0;
-        document.getElementById('dateFilter').selectedIndex = 0;
-        alert('Filters have been reset.');
-    });
+        "location_found": data.get("location_found"),
 
-    // Form Submissions (Mock)
-    const lostForm = document.getElementById("lost-item-form");
+        "description": data.get("description"),
 
-    if (lostForm) {
+        "image": data.get("image"),
 
-        lostForm.addEventListener("submit", async (e) => {
+        "status": "Found"
 
-            e.preventDefault();
+    })
+    add_activity(data.get("email"), "Reported Found Item")
 
-            const imageInput = document.getElementById("lostItemImage");
+    return jsonify({
+        "message": "Found Item Submitted Successfully"
+    })
 
-            let image = "";
-            const user = JSON.parse(localStorage.getItem("user"));
+@app.route("/lost-item", methods=["POST"])
+def lost_item():
 
-            if (imageInput.files.length > 0) {
-                image = imageInput.files[0].name;
-            }
+    data = request.json
 
-            const response = await fetch("http://127.0.0.1:5000/lost-item", {
+    lost_items.insert_one({
 
-                method: "POST",
+        "item_name": data.get("item_name"),
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        "category": data.get("category"),
 
-                body: JSON.stringify({
+        "date_lost": data.get("date_lost"),
 
-                    item_name: document.getElementById("lost-item-name").value,
+        "location_lost": data.get("location_lost"),
 
-                    category: document.getElementById("lost-category").value,
+        "description": data.get("description"),
 
-                    date_lost: document.getElementById("lost-date").value,
+        "image": data.get("image"),
 
-                    location_lost: document.getElementById("lost-location").value,
+        "status": "Lost"
 
-                    description: document.getElementById("lost-description").value,
+    })
+    add_activity(data.get("email"), "Reported Lost Item")
 
-                    image: image,
+    return jsonify({
+        "message": "Lost Item Submitted Successfully"
+    })
+@app.route("/quick-lost-item", methods=["POST"])
+def quick_lost_item():
 
-                    email: user.email
+    data = request.json
 
-                })
+    lost_items.insert_one({
 
-            });
+        "item_name": data.get("item_name"),
 
-            const data = await response.json();
+        "category": "Not Specified",
 
-            alert(data.message);
+        "date_lost": "",
 
-            if (response.ok) {
+        "location_lost": data.get("location_lost"),
 
-                lostForm.reset();
+        "description": data.get("description"),
 
-                const preview = document.getElementById("lostImagePreview");
+        "image": "",
 
-                if (preview) {
-                    preview.style.display = "none";
-                }
-                loadTotalLostItems();
-                loadRecentLostItems();
-                loadRecentActivities();
-                showDashboardPage(dashboardPage);
+        "status": "Lost"
 
-            }
+    })
+    add_activity(data.get("email"), "Reported Quick Lost Item")
 
-        });
+    return jsonify({
+        "message": "Quick Lost Report Submitted Successfully"
+    })
 
-    }
+@app.route("/quick-found-item", methods=["POST"])
+def quick_found_item():
 
-    const foundForm = document.getElementById("found-item-form");
+    data = request.json
 
-    if (foundForm) {
+    found_items.insert_one({
 
-        foundForm.addEventListener("submit", async (e) => {
+        "item_name": data.get("item_name"),
 
-            e.preventDefault();
-            const user = JSON.parse(localStorage.getItem("user"));
+        "category": "Not Specified",
 
-            const imageInput = document.getElementById("foundItemImage");
+        "date_found": "",
 
-            let image = "";
-            
+        "location_found": data.get("location_found"),
 
-            if (imageInput.files.length > 0) {
-                image = imageInput.files[0].name;
-            }
+        "description": data.get("description"),
 
-            const response = await fetch("http://127.0.0.1:5000/found-item", {
+        "image": "",
 
-                method: "POST",
+        "status": "Found"
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+    })
+    add_activity(data.get("email"), "Reported Quick Found Item")
 
-                body: JSON.stringify({
+    return jsonify({
+        "message": "Quick Found Report Submitted Successfully"
+    })
 
-                    item_name: document.getElementById("found-item-name").value,
+@app.route("/total-found-items", methods=["GET"])
+def total_found_items():
 
-                    category: document.getElementById("found-category").value,
+    total = found_items.count_documents({})
 
-                    date_found: document.getElementById("found-date").value,
+    return jsonify({
+        "total": total
+    })
+@app.route("/total-lost-items", methods=["GET"])
+def total_lost_items():
 
-                    location_found: document.getElementById("found-location").value,
+    total = lost_items.count_documents({})
 
-                    description: document.getElementById("found-description").value,
+    return jsonify({
+        "total": total
+    })
 
-                    image: image,
+@app.route("/recent-lost-items", methods=["GET"])
+def recent_lost_items():
 
-                    email: user.email
+    items = []
 
-                })
+    for item in lost_items.find().sort("_id", -1):
 
-            });
+        items.append({
 
-            const data = await response.json();
+    "item_name": item["item_name"],
 
-            alert(data.message);
+    "category": item.get("category", ""),
 
-            if (response.ok) {
+    "location_lost": item["location_lost"],
 
-                foundForm.reset();
+    "date_lost": item["date_lost"],
 
-                foundImagePreview.style.display = "none";
-                loadTotalFoundItems();
-                loadRecentActivities();
-                showDashboardPage(dashboardPage);
+    "description": item.get("description", ""),
 
-            }
+    "status": item["status"]
 
-        });
+})
 
-    }
+    return jsonify(items)
 
+@app.route("/recent-activities")
+def recent_activities():
 
+    print("Recent Activities API Called")
 
-    const quickLostForm = document.getElementById("quick-lost-form");
+    email = request.args.get("email")
 
-    if (quickLostForm) {
+    activities = []
 
-        quickLostForm.addEventListener("submit", async (e) => {
+    for activity in activity_logs.find({"email": email}).sort("time", -1).limit(10):
 
-            e.preventDefault();
-            const user = JSON.parse(localStorage.getItem("user"));
+        activity["_id"] = str(activity["_id"])
 
-            const response = await fetch("http://127.0.0.1:5000/quick-lost-item", {
+        activity["time"] = activity["time"].isoformat()
 
-                method: "POST",
+        activities.append(activity)
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+    return jsonify(activities)
 
-                body: JSON.stringify({
-
-                    item_name: document.getElementById("quick-lost-name").value,
-
-                    location_lost: document.getElementById("quick-lost-location").value,
-
-                    description: document.getElementById("quick-lost-description").value,
-
-                    email: user.email
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (response.ok) {
-
-                quickLostForm.reset();
-
-                loadTotalLostItems();
-                loadRecentLostItems();
-                loadRecentActivities();
-                showDashboardPage(dashboardPage);
-
-            }
-
-        });
-
-    }
-    const quickFoundForm = document.getElementById("quick-found-form");
-
-    if (quickFoundForm) {
-
-        quickFoundForm.addEventListener("submit", async (e) => {
-
-            e.preventDefault();
-            const user = JSON.parse(localStorage.getItem("user"));
-
-            const response = await fetch("http://127.0.0.1:5000/quick-found-item", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    item_name: document.getElementById("quick-found-name").value,
-
-                    location_found: document.getElementById("quick-found-location").value,
-
-                    description: document.getElementById("quick-found-description").value,
-
-                    email: user.email
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (response.ok) {
-
-                quickFoundForm.reset();
-                loadTotalFoundItems();
-                loadRecentActivities();
-                showDashboardPage(dashboardPage);
-
-            }
-
-        });
-
-    }
-    async function loadTotalFoundItems() {
-
-        const response = await fetch("http://127.0.0.1:5000/total-found-items");
-
-        const data = await response.json();
-
-        document.getElementById("total-found-items").innerText = data.total;
-
-    }
-
-    async function loadTotalLostItems() {
-
-        const response = await fetch("http://127.0.0.1:5000/total-lost-items");
-
-        const data = await response.json();
-
-        document.getElementById("total-lost-items").innerText = data.total;
-
-    }
-    async function loadRecentActivities() {
-
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) return;
-
-    const response = await fetch(
-        `http://127.0.0.1:5000/recent-activities?email=${user.email}`
-    );
-
-    const activities = await response.json();
-
-    const list = document.getElementById("recent-activity-list");
-
-    list.innerHTML = "";
-
-    activities.forEach(activity => {
-
-        list.innerHTML += `
-
-        <li class="list-group-item d-flex justify-content-between align-items-start">
-
-            <div class="ms-2 me-auto">
-
-                <div class="fw-bold">${activity.activity}</div>
-
-            </div>
-
-            <span class="badge bg-primary rounded-pill">
-
-                ${new Date(activity.time).toLocaleString()}
-
-            </span>
-
-        </li>
-
-        `;
-
-    });
-
-}
-    async function loadRecentLostItems() {
-
-        const response = await fetch("http://127.0.0.1:5000/recent-lost-items");
-
-        const items = await response.json();
-
-        const container = document.getElementById("recent-lost-items-container");
-
-        container.innerHTML = "";
-
-        items.forEach(item => {
-
-            container.innerHTML += `
-        <div class="col-md-6 col-lg-4">
-
-            <div class="item-card">
-
-                <div class="item-details">
-
-                    <span class="item-category category-lost">LOST</span>
-
-                    <h3 class="item-title">${item.item_name}</h3>
-
-                    <p class="item-description">${item.description}</p>
-
-                    <div class="item-meta">
-
-                        <span>
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            ${item.location_lost}
-                        </span>
-
-                        <span>
-                            <i class="fas fa-calendar me-1"></i>
-                            ${item.date_lost}
-                        </span>
-
-                    </div>
-
-                    <div class="item-actions">
-
-    <button class="btn btn-sm btn-outline-danger"
-    onclick="openFoundReport(
-        '${item.item_name}',
-        '${item.category}',
-        '${item.location_lost}'
-    )">
-
-    Mark as Found
-
-    </button>
-
-</div>
-
-                </div>
-
-            </div>
-
-        </div>
-        `;
-
-        });
-
-    }
-    function openFoundReport(itemName, category, location) {
-        console.log("openFoundReport called");
-        // Open the Report Found Item page
-        showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
-
-        // Fill the form
-        document.getElementById("found-item-name").value = itemName;
-
-        document.getElementById("found-category").value = category;
-
-        document.getElementById("found-location").value = location;
-
-        // Set today's date
-        document.getElementById("found-date").value =
-            new Date().toISOString().split("T")[0];
-    }
-    window.openFoundReport = openFoundReport;
-    // Profile Form Submissions (Mock)
-    // ---------------- UPDATE PROFILE ----------------
-
-    const profileForm = document.getElementById("profile-form");
-
-    if (profileForm) {
-
-        profileForm.addEventListener("submit", async (e) => {
-
-            e.preventDefault();
-
-            const user = JSON.parse(localStorage.getItem("user"));
-
-            const response = await fetch("http://127.0.0.1:5000/update-profile", {
-
-                method: "PUT",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    firstname: document.getElementById("profile-firstname").value,
-
-                    lastname: document.getElementById("profile-lastname").value,
-
-                    email: user.email,
-
-                    phone: document.getElementById("profile-phone").value
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (response.ok) {
-
-                localStorage.setItem("user", JSON.stringify(data.user));
-
-                loadUserProfile();
-                loadRecentActivities();
-
-            }
-
-        });
-
-    }
-
-    const passwordForm = document.getElementById("password-form");
-
-    if (passwordForm) {
-
-        passwordForm.addEventListener("submit", async (e) => {
-
-            e.preventDefault();
-
-            const user = JSON.parse(localStorage.getItem("user"));
-
-            const currentPassword = document.getElementById("current-password").value;
-
-            const newPassword = document.getElementById("new-password").value;
-
-            const confirmPassword = document.getElementById("confirm-password").value;
-
-            if (newPassword !== confirmPassword) {
-                alert("New passwords do not match");
-                return;
-            }
-
-            const response = await fetch("http://127.0.0.1:5000/change-password", {
-
-                method: "PUT",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    email: user.email,
-
-                    current_password: currentPassword,
-
-                    new_password: newPassword
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (response.ok) {
-
-                passwordForm.reset();
-
-            }
-
-        });
-
-    }
-
-    // Initialize with login page visible
-    const user = localStorage.getItem("user");
-
-    if (user) {
-
-        showPage(dashboardContainer);
-
-        showDashboardPage(dashboardPage);
-
-        loadUserProfile();
-
-        loadTotalFoundItems();
-
-        loadTotalLostItems();
-
-        loadRecentLostItems();
-        loadRecentActivities();
-
-    } else {
-
-        showPage(loginPage);
-
-    }
-});
+if __name__ == "__main__":
+    app.run(debug=True)
