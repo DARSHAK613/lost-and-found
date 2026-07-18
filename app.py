@@ -1,308 +1,825 @@
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from pymongo import MongoClient
 
-app = Flask(__name__)
-CORS(app)
+document.addEventListener('DOMContentLoaded', function () {
+    // Page Navigation
+    const loginPage = document.getElementById('login-page');
+    const registerPage = document.getElementById('register-page');
+    const dashboardContainer = document.getElementById('dashboard-container');
+    const dashboardPage = document.getElementById('dashboard-page');
+    const reportLostPage = document.getElementById('report-lost-page');
+    const reportFoundPage = document.getElementById('report-found-page');
+    const searchItemsPage = document.getElementById('search-items-page');
+    const profilePage = document.getElementById('profile-page');
+    const adminPanelPage = document.getElementById('admin-panel-page');
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["lost_found"]
-users = db["users"]
-found_items = db["found_items"]
-lost_items = db["lost_items"]
+    // Sidebar elements
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const adminItem = document.querySelector('.admin-item');
 
-@app.route("/")
-def home():
-    return "Server is running"
+    // Auth elements
+    const showRegisterLink = document.getElementById('show-register');
+    const showLoginLink = document.getElementById('show-login');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const logoutBtn = document.getElementById('logout-btn');
 
-@app.route("/register", methods=["POST"])
-def register():
+    // Form elements
+    const lostItemImage = document.getElementById('lostItemImage');
+    const lostImagePreview = document.getElementById('lostImagePreview');
+    const foundItemImage = document.getElementById('foundItemImage');
+    const foundImagePreview = document.getElementById('foundImagePreview');
+    const cancelLostReport = document.getElementById('cancel-lost-report');
+    const cancelFoundReport = document.getElementById('cancel-found-report');
 
-    data = request.json
-
-    firstname = data.get("firstname")
-    lastname = data.get("lastname")
-    email = data.get("email").strip().lower()
-    phone = data.get("phone")
-    studentid = data.get("studentid")
-    department = data.get("department")
-    password = data.get("password")
-
-    if users.find_one({"email": email}):
-        return jsonify({"message": "Email already registered"}), 400
-
-    users.insert_one({
-        "firstname": firstname,
-        "lastname": lastname,
-        "fullname": firstname + " " + lastname,
-        "email": email,
-        "phone": phone,
-        "studentid": studentid,
-        "department": department,
-        "password": password
-    })
-
-    return jsonify({"message": "Registration Successful"})
+    // Search elements
+    const searchButton = document.getElementById('searchButton');
+    const resetFilters = document.getElementById('resetFilters');
 
 
-@app.route("/login", methods=["POST"])
-def login():
-    data = request.get_json()
+    // Show admin panel if user is admin
 
-    email = data.get("email", "").strip().lower()
-    password = data.get("password", "").strip()
 
-    user = users.find_one({"email": email})
+    function loadUserProfile() {
 
-    if not user:
-        return jsonify({"message": "Email not found"}), 404
+        const user = JSON.parse(localStorage.getItem("user"));
 
-    if str(user.get("password")) != password:
-        return jsonify({"message": "Incorrect password"}), 401
+        if (!user) return;
 
-    return jsonify({
-        "message": "Login successful",
-        "user": {
-            "firstname": user["firstname"],
-            "lastname": user["lastname"],
-            "fullname": user["fullname"],
-            "email": user["email"],
-            "phone": user["phone"],
-            "studentid": user["studentid"],
-            "department": user["department"]
+        // Top Bar
+        document.querySelector(".user-info .fw-bold").innerText =
+            user.firstname + " " + user.lastname;
+
+        document.querySelector(".user-info .small").innerText =
+            user.email;
+
+        // Avatar (Top Bar)
+        document.querySelector(".user-avatar").innerText =
+            user.firstname.charAt(0).toUpperCase() +
+            user.lastname.charAt(0).toUpperCase();
+
+        // Profile Page
+        document.getElementById("profile-avatar").innerText =
+            user.firstname.charAt(0).toUpperCase() +
+            user.lastname.charAt(0).toUpperCase();
+
+        document.getElementById("profile-name").innerText =
+            user.firstname + " " + user.lastname;
+
+        document.getElementById("profile-email").innerText =
+            user.email;
+
+        // Form
+
+        document.getElementById("profile-firstname").value =
+            user.firstname;
+
+        document.getElementById("profile-lastname").value =
+            user.lastname;
+
+        document.getElementById("profile-email-input").value =
+            user.email;
+
+        document.getElementById("profile-phone").value =
+            user.phone;
+
+        document.getElementById("profile-studentid").value =
+            user.studentid;
+
+        document.getElementById("profile-department").value =
+            user.department;
+    }
+    // Page Navigation Functions
+    function showPage(pageElement) {
+
+        // Hide all pages
+        loginPage.classList.add('hidden');
+        registerPage.classList.add('hidden');
+        dashboardContainer.classList.add('hidden');
+
+        // Show requested page
+        pageElement.classList.remove('hidden');
+
+        // Close mobile menu if open
+        sidebar.classList.remove('active');
+    }
+
+    function showDashboardPage(pageElement, clickedLink) {
+        // Hide all dashboard subpages
+        dashboardPage.classList.add('hidden');
+        reportLostPage.classList.add('hidden');
+        reportFoundPage.classList.add('hidden');
+        searchItemsPage.classList.add('hidden');
+        profilePage.classList.add('hidden');
+        adminPanelPage.classList.add('hidden');
+
+
+        // Show requested dashboard subpage
+        pageElement.classList.remove('hidden');
+
+        // Update sidebar active link
+        sidebarLinks.forEach(link => link.classList.remove('active'));
+        if (clickedLink) {
+            clickedLink.classList.add('active');
         }
-    }), 200
-@app.route("/update-profile", methods=["PUT"])
-def update_profile():
+        loadTotalFoundItems();
+    }
 
-    data = request.json
+    // Event Listeners for Navigation
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showPage(registerPage);
+    });
 
-    email = data.get("email")
+    showLoginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showPage(loginPage);
+    });
 
-    users.update_one(
+    logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
 
-        {"email": email},
+        localStorage.removeItem("user"); // IMPORTANT
 
-        {
-            "$set": {
+        showPage(loginPage);
+    });
 
-                "firstname": data.get("firstname"),
+    // Dashboard Navigation
+    document.querySelectorAll('[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page');
 
-                "lastname": data.get("lastname"),
+            switch (pageId) {
+                case 'dashboard':
+                    showDashboardPage(dashboardPage, link);
+                    break;
+                case 'report-lost':
+                    showDashboardPage(reportLostPage);
+                    break;
+                case 'report-found':
+                    showDashboardPage(reportFoundPage);
+                    break;
+                case 'search-items':
+                    showDashboardPage(searchItemsPage);
+                    break;
+                case 'profile':
+                    showDashboardPage(profilePage);
+                    break;
+                case 'admin-panel':
+                    showDashboardPage(adminPanelPage);
+                    break;
+            }
+        });
+    });
 
-                "fullname": data.get("firstname") + " " + data.get("lastname"),
+    // Login and Register Form Submission
+    // ---------------- REGISTER ----------------
+    registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-                "phone": data.get("phone")
+        const firstname = document.getElementById("register-firstname").value;
+        const lastname = document.getElementById("register-lastname").value;
+        const email = document.getElementById("register-email").value;
+        const phone = document.getElementById("register-phone").value;
+        const studentid = document.getElementById("register-studentid").value;
+        const department = document.getElementById("register-department").value;
+        const password = document.getElementById("register-password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        const response = await fetch("http://127.0.0.1:5000/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                firstname,
+                lastname,
+                email,
+                phone,
+                studentid,
+                department,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if (response.ok) {
+            showPage(loginPage);
+        }
+    });
+
+
+    // ---------------- LOGIN ----------------
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.querySelector("#login-email").value;
+        const password = document.querySelector("#login-password").value;
+
+        const res = await fetch("http://127.0.0.1:5000/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await res.json();
+
+        console.log(data);
+
+        if (res.status === 200) {
+
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            showPage(dashboardContainer);
+
+            showDashboardPage(dashboardPage);
+
+            loadUserProfile();
+            loadRecentActivities();
+
+            loadTotalFoundItems();
+            loadTotalLostItems();
+            loadRecentLostItems();
+
+        } else {
+            alert(data.message);
+        }
+    });
+
+
+    // Image Preview for Lost Item Form
+    lostItemImage.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                lostImagePreview.src = event.target.result;
+                lostImagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Image Preview for Found Item Form
+    foundItemImage.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                foundImagePreview.src = event.target.result;
+                foundImagePreview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Cancel Report Buttons
+    cancelLostReport.addEventListener('click', () => {
+        showDashboardPage(dashboardPage);
+        document.getElementById('lost-item-form').reset();
+        lostImagePreview.style.display = 'none';
+    });
+
+    cancelFoundReport.addEventListener('click', () => {
+        showDashboardPage(dashboardPage);
+        document.getElementById('found-item-form').reset();
+        foundImagePreview.style.display = 'none';
+    });
+
+    // Search Functionality
+    searchButton.addEventListener('click', () => {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if (searchTerm) {
+            alert(`Searching for: ${searchTerm}\nIn a real application, this would filter the results.`);
+        }
+    });
+
+    resetFilters.addEventListener('click', () => {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').selectedIndex = 0;
+        document.getElementById('statusFilter').selectedIndex = 0;
+        document.getElementById('dateFilter').selectedIndex = 0;
+        alert('Filters have been reset.');
+    });
+
+    // Form Submissions (Mock)
+    const lostForm = document.getElementById("lost-item-form");
+
+    if (lostForm) {
+
+        lostForm.addEventListener("submit", async (e) => {
+
+            e.preventDefault();
+
+            const imageInput = document.getElementById("lostItemImage");
+
+            let image = "";
+            const user = JSON.parse(localStorage.getItem("user"));
+
+            if (imageInput.files.length > 0) {
+                image = imageInput.files[0].name;
+            }
+
+            const response = await fetch("http://127.0.0.1:5000/lost-item", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    item_name: document.getElementById("lost-item-name").value,
+
+                    category: document.getElementById("lost-category").value,
+
+                    date_lost: document.getElementById("lost-date").value,
+
+                    location_lost: document.getElementById("lost-location").value,
+
+                    description: document.getElementById("lost-description").value,
+
+                    image: image,
+
+                    email: user.email
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (response.ok) {
+
+                lostForm.reset();
+
+                const preview = document.getElementById("lostImagePreview");
+
+                if (preview) {
+                    preview.style.display = "none";
+                }
+                loadTotalLostItems();
+                loadRecentLostItems();
+                loadRecentActivities();
+                showDashboardPage(dashboardPage);
 
             }
-        }
 
-    )
+        });
 
-    updated = users.find_one({"email": email})
+    }
 
-    return jsonify({
+    const foundForm = document.getElementById("found-item-form");
 
-        "message": "Profile Updated",
+    if (foundForm) {
 
-        "user": {
+        foundForm.addEventListener("submit", async (e) => {
 
-            "firstname": updated["firstname"],
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
-            "lastname": updated["lastname"],
+            const imageInput = document.getElementById("foundItemImage");
 
-            "fullname": updated["fullname"],
+            let image = "";
+            
 
-            "email": updated["email"],
-
-            "phone": updated["phone"],
-
-            "studentid": updated["studentid"],
-
-            "department": updated["department"]
-
-        }
-
-    })
-
-@app.route("/change-password", methods=["PUT"])
-def change_password():
-
-    data = request.json
-
-    email = data.get("email")
-    current_password = data.get("current_password")
-    new_password = data.get("new_password")
-
-    user = users.find_one({"email": email})
-
-    if not user:
-        return jsonify({"message": "User not found"}), 404
-
-    if user["password"] != current_password:
-        return jsonify({"message": "Current password is incorrect"}), 400
-
-    users.update_one(
-        {"email": email},
-        {
-            "$set": {
-                "password": new_password
+            if (imageInput.files.length > 0) {
+                image = imageInput.files[0].name;
             }
-        }
-    )
 
-    return jsonify({
-        "message": "Password changed successfully"
-    })
-@app.route("/found-item", methods=["POST"])
-def found_item():
+            const response = await fetch("http://127.0.0.1:5000/found-item", {
 
-    data = request.json
+                method: "POST",
 
-    found_items.insert_one({
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        "item_name": data.get("item_name"),
+                body: JSON.stringify({
 
-        "category": data.get("category"),
+                    item_name: document.getElementById("found-item-name").value,
 
-        "date_found": data.get("date_found"),
+                    category: document.getElementById("found-category").value,
 
-        "location_found": data.get("location_found"),
+                    date_found: document.getElementById("found-date").value,
 
-        "description": data.get("description"),
+                    location_found: document.getElementById("found-location").value,
 
-        "image": data.get("image"),
+                    description: document.getElementById("found-description").value,
 
-        "status": "Found"
+                    image: image,
 
-    })
+                    email: user.email
 
-    return jsonify({
-        "message": "Found Item Submitted Successfully"
-    })
+                })
 
-@app.route("/lost-item", methods=["POST"])
-def lost_item():
+            });
 
-    data = request.json
+            const data = await response.json();
 
-    lost_items.insert_one({
+            alert(data.message);
 
-        "item_name": data.get("item_name"),
+            if (response.ok) {
 
-        "category": data.get("category"),
+                foundForm.reset();
 
-        "date_lost": data.get("date_lost"),
+                foundImagePreview.style.display = "none";
+                loadTotalFoundItems();
+                loadRecentActivities();
+                showDashboardPage(dashboardPage);
 
-        "location_lost": data.get("location_lost"),
+            }
 
-        "description": data.get("description"),
+        });
 
-        "image": data.get("image"),
+    }
 
-        "status": "Lost"
 
-    })
 
-    return jsonify({
-        "message": "Lost Item Submitted Successfully"
-    })
-@app.route("/quick-lost-item", methods=["POST"])
-def quick_lost_item():
+    const quickLostForm = document.getElementById("quick-lost-form");
 
-    data = request.json
+    if (quickLostForm) {
 
-    lost_items.insert_one({
+        quickLostForm.addEventListener("submit", async (e) => {
 
-        "item_name": data.get("item_name"),
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
-        "category": "Not Specified",
+            const response = await fetch("http://127.0.0.1:5000/quick-lost-item", {
 
-        "date_lost": "",
+                method: "POST",
 
-        "location_lost": data.get("location_lost"),
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        "description": data.get("description"),
+                body: JSON.stringify({
 
-        "image": "",
+                    item_name: document.getElementById("quick-lost-name").value,
 
-        "status": "Lost"
+                    location_lost: document.getElementById("quick-lost-location").value,
 
-    })
+                    description: document.getElementById("quick-lost-description").value,
 
-    return jsonify({
-        "message": "Quick Lost Report Submitted Successfully"
-    })
+                    email: user.email
 
-@app.route("/quick-found-item", methods=["POST"])
-def quick_found_item():
+                })
 
-    data = request.json
+            });
 
-    found_items.insert_one({
+            const data = await response.json();
 
-        "item_name": data.get("item_name"),
+            alert(data.message);
 
-        "category": "Not Specified",
+            if (response.ok) {
 
-        "date_found": "",
+                quickLostForm.reset();
 
-        "location_found": data.get("location_found"),
+                loadTotalLostItems();
+                loadRecentLostItems();
+                loadRecentActivities();
+                showDashboardPage(dashboardPage);
 
-        "description": data.get("description"),
+            }
 
-        "image": "",
+        });
 
-        "status": "Found"
+    }
+    const quickFoundForm = document.getElementById("quick-found-form");
 
-    })
+    if (quickFoundForm) {
 
-    return jsonify({
-        "message": "Quick Found Report Submitted Successfully"
-    })
+        quickFoundForm.addEventListener("submit", async (e) => {
 
-@app.route("/total-found-items", methods=["GET"])
-def total_found_items():
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
-    total = found_items.count_documents({})
+            const response = await fetch("http://127.0.0.1:5000/quick-found-item", {
 
-    return jsonify({
-        "total": total
-    })
-@app.route("/total-lost-items", methods=["GET"])
-def total_lost_items():
+                method: "POST",
 
-    total = lost_items.count_documents({})
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    return jsonify({
-        "total": total
-    })
+                body: JSON.stringify({
 
-@app.route("/recent-lost-items", methods=["GET"])
-def recent_lost_items():
+                    item_name: document.getElementById("quick-found-name").value,
 
-    items = []
+                    location_found: document.getElementById("quick-found-location").value,
 
-    for item in lost_items.find().sort("_id", -1):
+                    description: document.getElementById("quick-found-description").value,
 
-        items.append({
+                    email: user.email
 
-    "item_name": item["item_name"],
+                })
 
-    "category": item.get("category", ""),
+            });
 
-    "location_lost": item["location_lost"],
+            const data = await response.json();
 
-    "date_lost": item["date_lost"],
+            alert(data.message);
 
-    "description": item.get("description", ""),
+            if (response.ok) {
 
-    "status": item["status"]
+                quickFoundForm.reset();
+                loadTotalFoundItems();
+                loadRecentActivities();
+                showDashboardPage(dashboardPage);
 
-})
+            }
 
-    return jsonify(items)
+        });
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    }
+    async function loadTotalFoundItems() {
+
+        const response = await fetch("http://127.0.0.1:5000/total-found-items");
+
+        const data = await response.json();
+
+        document.getElementById("total-found-items").innerText = data.total;
+
+    }
+
+    async function loadTotalLostItems() {
+
+        const response = await fetch("http://127.0.0.1:5000/total-lost-items");
+
+        const data = await response.json();
+
+        document.getElementById("total-lost-items").innerText = data.total;
+
+    }
+    async function loadRecentActivities() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) return;
+
+    const response = await fetch(
+        `http://127.0.0.1:5000/recent-activities?email=${user.email}`
+    );
+
+    const activities = await response.json();
+
+    const list = document.getElementById("recent-activity-list");
+
+    list.innerHTML = "";
+
+    activities.forEach(activity => {
+
+        list.innerHTML += `
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+
+            <div class="ms-2 me-auto">
+
+                <div class="fw-bold">${activity.activity}</div>
+
+            </div>
+
+            <span class="badge bg-primary rounded-pill">
+
+                ${new Date(activity.time).toLocaleString()}
+
+            </span>
+
+        </li>
+
+        `;
+
+    });
+
+}
+    async function loadRecentLostItems() {
+
+        const response = await fetch("http://127.0.0.1:5000/recent-lost-items");
+
+        const items = await response.json();
+
+        const container = document.getElementById("recent-lost-items-container");
+
+        container.innerHTML = "";
+
+        items.forEach(item => {
+
+            container.innerHTML += `
+        <div class="col-md-6 col-lg-4">
+
+            <div class="item-card">
+
+                <div class="item-details">
+
+                    <span class="item-category category-lost">LOST</span>
+
+                    <h3 class="item-title">${item.item_name}</h3>
+
+                    <p class="item-description">${item.description}</p>
+
+                    <div class="item-meta">
+
+                        <span>
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            ${item.location_lost}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-calendar me-1"></i>
+                            ${item.date_lost}
+                        </span>
+
+                    </div>
+
+                    <div class="item-actions">
+
+    <button class="btn btn-sm btn-outline-danger"
+    onclick="openFoundReport(
+        '${item.item_name}',
+        '${item.category}',
+        '${item.location_lost}'
+    )">
+
+    Mark as Found
+
+    </button>
+
+</div>
+
+                </div>
+
+            </div>
+
+        </div>
+        `;
+
+        });
+
+    }
+    function openFoundReport(itemName, category, location) {
+        console.log("openFoundReport called");
+        // Open the Report Found Item page
+        showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
+
+        // Fill the form
+        document.getElementById("found-item-name").value = itemName;
+
+        document.getElementById("found-category").value = category;
+
+        document.getElementById("found-location").value = location;
+
+        // Set today's date
+        document.getElementById("found-date").value =
+            new Date().toISOString().split("T")[0];
+    }
+    window.openFoundReport = openFoundReport;
+    // Profile Form Submissions (Mock)
+    // ---------------- UPDATE PROFILE ----------------
+
+    const profileForm = document.getElementById("profile-form");
+
+    if (profileForm) {
+
+        profileForm.addEventListener("submit", async (e) => {
+
+            e.preventDefault();
+
+            const user = JSON.parse(localStorage.getItem("user"));
+
+            const response = await fetch("http://127.0.0.1:5000/update-profile", {
+
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    firstname: document.getElementById("profile-firstname").value,
+
+                    lastname: document.getElementById("profile-lastname").value,
+
+                    email: user.email,
+
+                    phone: document.getElementById("profile-phone").value
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (response.ok) {
+
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                loadUserProfile();
+                loadRecentActivities();
+
+            }
+
+        });
+
+    }
+
+    const passwordForm = document.getElementById("password-form");
+
+    if (passwordForm) {
+
+        passwordForm.addEventListener("submit", async (e) => {
+
+            e.preventDefault();
+
+            const user = JSON.parse(localStorage.getItem("user"));
+
+            const currentPassword = document.getElementById("current-password").value;
+
+            const newPassword = document.getElementById("new-password").value;
+
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            if (newPassword !== confirmPassword) {
+                alert("New passwords do not match");
+                return;
+            }
+
+            const response = await fetch("http://127.0.0.1:5000/change-password", {
+
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    email: user.email,
+
+                    current_password: currentPassword,
+
+                    new_password: newPassword
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (response.ok) {
+
+                passwordForm.reset();
+
+            }
+
+        });
+
+    }
+
+    // Initialize with login page visible
+    const user = localStorage.getItem("user");
+
+    if (user) {
+
+        showPage(dashboardContainer);
+
+        showDashboardPage(dashboardPage);
+
+        loadUserProfile();
+
+        loadTotalFoundItems();
+
+        loadTotalLostItems();
+
+        loadRecentLostItems();
+        loadRecentActivities();
+
+    } else {
+
+        showPage(loginPage);
+
+    }
+});
