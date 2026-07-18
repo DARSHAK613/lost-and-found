@@ -2,37 +2,47 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-
+from bson.codec_options import CodecOptions
 
 app = Flask(__name__)
 CORS(app)
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["lost_found"]
+
+
+client = MongoClient(
+    "mongodb://localhost:27017/",
+    tz_aware=True
+)
+
+db = client["lost_found"].with_options(
+    codec_options=CodecOptions(tz_aware=True)
+)
 users = db["users"]
 found_items = db["found_items"]
 lost_items = db["lost_items"]
 activity_logs = db["activity_logs"]
 
 
-from datetime import datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 def add_activity(email, activity):
-
+    print("Saving Time:", datetime.now(ZoneInfo("Asia/Kolkata")))
     activity_logs.insert_one({
 
         "email": email,
 
         "activity": activity,
 
-        "time": datetime.now(ZoneInfo("Asia/Kolkata"))
+        "time": datetime.now(timezone.utc)
 
     })
 
 @app.route("/")
 def home():
     return "Server is running"
+
+
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -64,6 +74,7 @@ def register():
     return jsonify({"message": "Registration Successful"})
 
 
+
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -91,6 +102,9 @@ def login():
             "department": user["department"]
         }
     }), 200
+
+
+
 @app.route("/update-profile", methods=["PUT"])
 def update_profile():
 
@@ -146,6 +160,9 @@ def update_profile():
 
     })
 
+
+
+
 @app.route("/change-password", methods=["PUT"])
 def change_password():
 
@@ -176,6 +193,9 @@ def change_password():
     return jsonify({
         "message": "Password changed successfully"
     })
+
+
+
 @app.route("/found-item", methods=["POST"])
 def found_item():
 
@@ -204,6 +224,8 @@ def found_item():
         "message": "Found Item Submitted Successfully"
     })
 
+
+
 @app.route("/lost-item", methods=["POST"])
 def lost_item():
 
@@ -231,6 +253,9 @@ def lost_item():
     return jsonify({
         "message": "Lost Item Submitted Successfully"
     })
+
+
+
 @app.route("/quick-lost-item", methods=["POST"])
 def quick_lost_item():
 
@@ -258,6 +283,8 @@ def quick_lost_item():
     return jsonify({
         "message": "Quick Lost Report Submitted Successfully"
     })
+
+
 
 @app.route("/quick-found-item", methods=["POST"])
 def quick_found_item():
@@ -287,6 +314,8 @@ def quick_found_item():
         "message": "Quick Found Report Submitted Successfully"
     })
 
+
+
 @app.route("/total-found-items", methods=["GET"])
 def total_found_items():
 
@@ -295,6 +324,9 @@ def total_found_items():
     return jsonify({
         "total": total
     })
+
+
+
 @app.route("/total-lost-items", methods=["GET"])
 def total_lost_items():
 
@@ -303,6 +335,9 @@ def total_lost_items():
     return jsonify({
         "total": total
     })
+
+
+
 
 @app.route("/recent-lost-items", methods=["GET"])
 def recent_lost_items():
@@ -329,6 +364,8 @@ def recent_lost_items():
 
     return jsonify(items)
 
+
+
 @app.route("/recent-activities")
 def recent_activities():
 
@@ -339,6 +376,7 @@ def recent_activities():
     activities = []
 
     for activity in activity_logs.find({"email": email}).sort("time", -1).limit(10):
+        print("Mongo Time:", activity["time"])
 
         activity["_id"] = str(activity["_id"])
 
@@ -347,6 +385,9 @@ def recent_activities():
         activities.append(activity)
 
     return jsonify(activities)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
