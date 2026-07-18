@@ -228,37 +228,38 @@ document.addEventListener('DOMContentLoaded', function () {
         const password = document.querySelector("#login-password").value;
 
         const res = await fetch("http://127.0.0.1:5000/login", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        email: email,
-        password: password
-    })
-});
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
 
-const data = await res.json();
+        const data = await res.json();
 
-console.log(data);
+        console.log(data);
 
-if (res.status === 200) {
+        if (res.status === 200) {
 
-    localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("user", JSON.stringify(data.user));
 
-    showPage(dashboardContainer);
+            showPage(dashboardContainer);
 
-    showDashboardPage(dashboardPage);
+            showDashboardPage(dashboardPage);
 
-    loadUserProfile();
+            loadUserProfile();
+            loadRecentActivities();
 
-    loadTotalFoundItems();
-    loadTotalLostItems();
-    loadRecentLostItems();
+            loadTotalFoundItems();
+            loadTotalLostItems();
+            loadRecentLostItems();
 
-} else {
-    alert(data.message);
-}
+        } else {
+            alert(data.message);
+        }
     });
 
 
@@ -329,6 +330,7 @@ if (res.status === 200) {
             const imageInput = document.getElementById("lostItemImage");
 
             let image = "";
+            const user = JSON.parse(localStorage.getItem("user"));
 
             if (imageInput.files.length > 0) {
                 image = imageInput.files[0].name;
@@ -354,7 +356,9 @@ if (res.status === 200) {
 
                     description: document.getElementById("lost-description").value,
 
-                    image: image
+                    image: image,
+
+                    email: user.email
 
                 })
 
@@ -375,7 +379,7 @@ if (res.status === 200) {
                 }
                 loadTotalLostItems();
                 loadRecentLostItems();
-
+                loadRecentActivities();
                 showDashboardPage(dashboardPage);
 
             }
@@ -391,10 +395,12 @@ if (res.status === 200) {
         foundForm.addEventListener("submit", async (e) => {
 
             e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
             const imageInput = document.getElementById("foundItemImage");
 
             let image = "";
+            
 
             if (imageInput.files.length > 0) {
                 image = imageInput.files[0].name;
@@ -420,7 +426,9 @@ if (res.status === 200) {
 
                     description: document.getElementById("found-description").value,
 
-                    image: image
+                    image: image,
+
+                    email: user.email
 
                 })
 
@@ -436,7 +444,7 @@ if (res.status === 200) {
 
                 foundImagePreview.style.display = "none";
                 loadTotalFoundItems();
-
+                loadRecentActivities();
                 showDashboardPage(dashboardPage);
 
             }
@@ -454,6 +462,7 @@ if (res.status === 200) {
         quickLostForm.addEventListener("submit", async (e) => {
 
             e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
             const response = await fetch("http://127.0.0.1:5000/quick-lost-item", {
 
@@ -469,7 +478,9 @@ if (res.status === 200) {
 
                     location_lost: document.getElementById("quick-lost-location").value,
 
-                    description: document.getElementById("quick-lost-description").value
+                    description: document.getElementById("quick-lost-description").value,
+
+                    email: user.email
 
                 })
 
@@ -485,7 +496,7 @@ if (res.status === 200) {
 
                 loadTotalLostItems();
                 loadRecentLostItems();
-
+                loadRecentActivities();
                 showDashboardPage(dashboardPage);
 
             }
@@ -500,6 +511,7 @@ if (res.status === 200) {
         quickFoundForm.addEventListener("submit", async (e) => {
 
             e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
 
             const response = await fetch("http://127.0.0.1:5000/quick-found-item", {
 
@@ -515,7 +527,9 @@ if (res.status === 200) {
 
                     location_found: document.getElementById("quick-found-location").value,
 
-                    description: document.getElementById("quick-found-description").value
+                    description: document.getElementById("quick-found-description").value,
+
+                    email: user.email
 
                 })
 
@@ -529,7 +543,7 @@ if (res.status === 200) {
 
                 quickFoundForm.reset();
                 loadTotalFoundItems();
-
+                loadRecentActivities();
                 showDashboardPage(dashboardPage);
 
             }
@@ -556,6 +570,47 @@ if (res.status === 200) {
         document.getElementById("total-lost-items").innerText = data.total;
 
     }
+    async function loadRecentActivities() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) return;
+
+    const response = await fetch(
+        `http://127.0.0.1:5000/recent-activities?email=${user.email}`
+    );
+
+    const activities = await response.json();
+
+    const list = document.getElementById("recent-activity-list");
+
+    list.innerHTML = "";
+
+    activities.forEach(activity => {
+
+        list.innerHTML += `
+
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+
+            <div class="ms-2 me-auto">
+
+                <div class="fw-bold">${activity.activity}</div>
+
+            </div>
+
+            <span class="badge bg-primary rounded-pill">
+
+                ${new Date(activity.time).toLocaleString()}
+
+            </span>
+
+        </li>
+
+        `;
+
+    });
+
+}
     async function loadRecentLostItems() {
 
         const response = await fetch("http://127.0.0.1:5000/recent-lost-items");
@@ -621,22 +676,22 @@ if (res.status === 200) {
 
     }
     function openFoundReport(itemName, category, location) {
-         console.log("openFoundReport called");
-    // Open the Report Found Item page
-    showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
+        console.log("openFoundReport called");
+        // Open the Report Found Item page
+        showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
 
-    // Fill the form
-    document.getElementById("found-item-name").value = itemName;
+        // Fill the form
+        document.getElementById("found-item-name").value = itemName;
 
-    document.getElementById("found-category").value = category;
+        document.getElementById("found-category").value = category;
 
-    document.getElementById("found-location").value = location;
+        document.getElementById("found-location").value = location;
 
-    // Set today's date
-    document.getElementById("found-date").value =
-        new Date().toISOString().split("T")[0];
-}
-window.openFoundReport = openFoundReport;
+        // Set today's date
+        document.getElementById("found-date").value =
+            new Date().toISOString().split("T")[0];
+    }
+    window.openFoundReport = openFoundReport;
     // Profile Form Submissions (Mock)
     // ---------------- UPDATE PROFILE ----------------
 
@@ -681,6 +736,7 @@ window.openFoundReport = openFoundReport;
                 localStorage.setItem("user", JSON.stringify(data.user));
 
                 loadUserProfile();
+                loadRecentActivities();
 
             }
 
@@ -690,79 +746,80 @@ window.openFoundReport = openFoundReport;
 
     const passwordForm = document.getElementById("password-form");
 
-if (passwordForm) {
+    if (passwordForm) {
 
-    passwordForm.addEventListener("submit", async (e) => {
+        passwordForm.addEventListener("submit", async (e) => {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        const user = JSON.parse(localStorage.getItem("user"));
+            const user = JSON.parse(localStorage.getItem("user"));
 
-        const currentPassword = document.getElementById("current-password").value;
+            const currentPassword = document.getElementById("current-password").value;
 
-        const newPassword = document.getElementById("new-password").value;
+            const newPassword = document.getElementById("new-password").value;
 
-        const confirmPassword = document.getElementById("confirm-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
 
-        if (newPassword !== confirmPassword) {
-            alert("New passwords do not match");
-            return;
-        }
+            if (newPassword !== confirmPassword) {
+                alert("New passwords do not match");
+                return;
+            }
 
-        const response = await fetch("http://127.0.0.1:5000/change-password", {
+            const response = await fetch("http://127.0.0.1:5000/change-password", {
 
-            method: "PUT",
+                method: "PUT",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            body: JSON.stringify({
+                body: JSON.stringify({
 
-                email: user.email,
+                    email: user.email,
 
-                current_password: currentPassword,
+                    current_password: currentPassword,
 
-                new_password: newPassword
+                    new_password: newPassword
 
-            })
+                })
+
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (response.ok) {
+
+                passwordForm.reset();
+
+            }
 
         });
 
-        const data = await response.json();
-
-        alert(data.message);
-
-        if (response.ok) {
-
-            passwordForm.reset();
-
-        }
-
-    });
-
-}
+    }
 
     // Initialize with login page visible
-   const user = localStorage.getItem("user");
+    const user = localStorage.getItem("user");
 
-if (user) {
+    if (user) {
 
-    showPage(dashboardContainer);
+        showPage(dashboardContainer);
 
-    showDashboardPage(dashboardPage);
+        showDashboardPage(dashboardPage);
 
-    loadUserProfile();
+        loadUserProfile();
 
-    loadTotalFoundItems();
+        loadTotalFoundItems();
 
-    loadTotalLostItems();
+        loadTotalLostItems();
 
-    loadRecentLostItems();
+        loadRecentLostItems();
+        loadRecentActivities();
 
-} else {
+    } else {
 
-    showPage(loginPage);
+        showPage(loginPage);
 
-}
+    }
 });
