@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Show admin panel if user is admin
 
 
+
+    
     function loadUserProfile() {
 
         const user = JSON.parse(localStorage.getItem("user"));
@@ -92,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
             user.department;
     }
     // Page Navigation Functions
+
+
+
     function showPage(pageElement) {
 
         // Hide all pages
@@ -105,6 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close mobile menu if open
         sidebar.classList.remove('active');
     }
+
+
 
     function showDashboardPage(pageElement, clickedLink) {
         // Hide all dashboard subpages
@@ -127,6 +134,9 @@ document.addEventListener('DOMContentLoaded', function () {
         loadTotalFoundItems();
     }
 
+
+
+
     // Event Listeners for Navigation
     showRegisterLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -145,6 +155,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         showPage(loginPage);
     });
+
+
+
 
     // Dashboard Navigation
     document.querySelectorAll('[data-page]').forEach(link => {
@@ -174,6 +187,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+
+
 
     // Login and Register Form Submission
     // ---------------- REGISTER ----------------
@@ -218,6 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
             showPage(loginPage);
         }
     });
+
+
+
 
 
     // ---------------- LOGIN ----------------
@@ -318,6 +337,10 @@ document.addEventListener('DOMContentLoaded', function () {
         alert('Filters have been reset.');
     });
 
+
+
+
+
     // Form Submissions (Mock)
     const lostForm = document.getElementById("lost-item-form");
 
@@ -388,6 +411,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
+
+
+
     const foundForm = document.getElementById("found-item-form");
 
     if (foundForm) {
@@ -400,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const imageInput = document.getElementById("foundItemImage");
 
             let image = "";
-            
+
 
             if (imageInput.files.length > 0) {
                 image = imageInput.files[0].name;
@@ -504,6 +530,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
+
     const quickFoundForm = document.getElementById("quick-found-form");
 
     if (quickFoundForm) {
@@ -551,6 +580,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
+
     async function loadTotalFoundItems() {
 
         const response = await fetch("http://127.0.0.1:5000/total-found-items");
@@ -561,6 +593,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
+
+
     async function loadTotalLostItems() {
 
         const response = await fetch("http://127.0.0.1:5000/total-lost-items");
@@ -570,25 +604,76 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("total-lost-items").innerText = data.total;
 
     }
+
+
+
+
+    function getTimeAgo(time) {
+
+        const now = new Date();
+        const activityTime = new Date(time);
+
+        console.log("NOW:", now);
+        console.log("ACTIVITY:", activityTime);
+
+        const diff = now - activityTime;
+
+        console.log("DIFF (ms):", diff);
+
+        const seconds = Math.floor(diff / 1000);
+        console.log("SECONDS:", seconds);
+
+        const minutes = Math.floor(seconds / 60);
+        console.log("MINUTES:", minutes);
+
+        if (seconds < 60) return "Just now";
+
+        if (minutes < 60)
+            return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+
+        const hours = Math.floor(minutes / 60);
+        console.log("HOURS:", hours);
+
+        if (hours < 24)
+            return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+
+        const days = Math.floor(hours / 24);
+
+        if (days === 1) return "Yesterday";
+
+        if (days < 7)
+            return `${days} days ago`;
+
+        return activityTime.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+
+
+
     async function loadRecentActivities() {
 
-    const user = JSON.parse(localStorage.getItem("user"));
+        const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!user) return;
+        if (!user) return;
 
-    const response = await fetch(
-        `http://127.0.0.1:5000/recent-activities?email=${user.email}`
-    );
+        const response = await fetch(
+            `http://127.0.0.1:5000/recent-activities?email=${user.email}`
+        );
 
-    const activities = await response.json();
+        const activities = await response.json();
 
-    const list = document.getElementById("recent-activity-list");
+        const list = document.getElementById("recent-activity-list");
 
-    list.innerHTML = "";
+        list.innerHTML = "";
 
-    activities.forEach(activity => {
+        activities.forEach(activity => {
+            console.log(activity);
 
-        list.innerHTML += `
+            list.innerHTML += `
 
         <li class="list-group-item d-flex justify-content-between align-items-start">
 
@@ -598,9 +683,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             </div>
 
+            
             <span class="badge bg-primary rounded-pill">
 
-                ${new Date(activity.time).toLocaleString()}
+                ${getTimeAgo(activity.time)}
 
             </span>
 
@@ -608,9 +694,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         `;
 
-    });
+        });
 
-}
+    }
+
+
+
+
+
     async function loadRecentLostItems() {
 
         const response = await fetch("http://127.0.0.1:5000/recent-lost-items");
@@ -675,6 +766,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
+
     function openFoundReport(itemName, category, location) {
         console.log("openFoundReport called");
         // Open the Report Found Item page
@@ -692,6 +786,11 @@ document.addEventListener('DOMContentLoaded', function () {
             new Date().toISOString().split("T")[0];
     }
     window.openFoundReport = openFoundReport;
+
+
+
+
+
     // Profile Form Submissions (Mock)
     // ---------------- UPDATE PROFILE ----------------
 
@@ -743,6 +842,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
 
     const passwordForm = document.getElementById("password-form");
 
@@ -798,6 +899,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+
+
 
     // Initialize with login page visible
     const user = localStorage.getItem("user");
