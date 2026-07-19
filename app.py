@@ -1,8 +1,15 @@
-
+import smtplib
+EMAIL_ADDRESS = "lostandfoundgpmweb@gmail.com"
+EMAIL_PASSWORD = "ogsi nqhd jgpk vyyw"
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
+from datetime import timedelta
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson.codec_options import CodecOptions
+
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +28,7 @@ users = db["users"]
 found_items = db["found_items"]
 lost_items = db["lost_items"]
 activity_logs = db["activity_logs"]
-
+pending_users = db["pending_users"]
 
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -38,11 +45,159 @@ def add_activity(email, activity):
 
     })
 
+def send_otp_email(receiver_email, otp):
+
+    subject = "Lost & Found - Email Verification OTP"
+
+    body = f"""
+Hello,
+
+Your OTP for Lost & Found Account Verification is:
+
+{otp}
+
+This OTP will expire in 5 minutes.
+
+If you did not request this OTP, please ignore this email.
+
+Regards,
+Lost & Found Team
+"""
+
+    message = MIMEMultipart()
+    message["From"] = EMAIL_ADDRESS
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(body, "plain"))
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.sendmail(
+            EMAIL_ADDRESS,
+            receiver_email,
+            message.as_string()
+        )
+        server.quit()
+
+        return True
+
+    except Exception as e:
+        print("Email Error:", e)
+        return False
+
 @app.route("/")
 def home():
     return "Server is running"
 
+@app.route("/send-otp", methods=["POST"])
+def send_otp():
 
+    data = request.json
+
+    email = data.get("email").strip().lower()
+
+    # Check if email already exists
+    if users.find_one({"email": email}):
+        return jsonify({"message": "Email already registered"}), 400
+
+    # Generate 6-digit OTP
+    otp = str(random.randint(100000, 999999))
+
+    # Remove any previous pending registration
+    pending_users.delete_many({"email": email})
+
+    # Save user details with OTP
+    pending_users.insert_one({
+        "firstname": data.get("firstname"),
+        "lastname": data.get("lastname"),
+        "fullname": data.get("firstname") + " " + data.get("lastname"),
+        "email": email,
+        "phone": data.get("phone"),
+        "studentid": data.get("studentid"),
+        "department": data.get("department"),
+        "password": data.get("password"),
+        "otp": otp,
+        "created_at": datetime.now(timezone.utc)
+    })
+
+    # Send Email
+    if send_otp_email(email, otp):
+        return jsonify({"message": "OTP sent successfully."})
+
+    # If email sending fails
+    pending_users.delete_one({"email": email})
+
+    return jsonify({"message": "Failed to send OTP"}), 500
+
+
+
+@app.route("/verify-otp", methods=["POST"])
+def verify_otp():
+    print("VERIFY OTP CALLED")
+
+    data = request.json
+
+    email = data.get("email").strip().lower()
+    otp = data.get("otp").strip()
+
+    pending_user = pending_users.find_one({"email": email})
+
+    if not pending_user:
+        return jsonify({"message": "Registration session expired."}), 400
+
+    if pending_user["otp"] != otp:
+        return jsonify({"message": "Invalid OTP"}), 400
+
+    users.insert_one({
+        "firstname": pending_user["firstname"],
+        "lastname": pending_user["lastname"],
+        "fullname": pending_user["fullname"],
+        "email": pending_user["email"],
+        "phone": pending_user["phone"],
+        "studentid": pending_user["studentid"],
+        "department": pending_user["department"],
+        "password": pending_user["password"]
+    })
+
+    pending_users.delete_one({"email": email})
+
+    return jsonify({"message": "Account created successfully!"})
+
+
+@app.route("/resend-otp", methods=["POST"])
+def resend_otp():
+
+    data = request.json
+
+    email = data.get("email").strip().lower()
+
+    pending_user = pending_users.find_one({"email": email})
+
+    if not pending_user:
+        return jsonify({"message": "Registration session expired."}), 400
+
+    # Generate a new OTP
+    new_otp = str(random.randint(100000, 999999))
+
+    # Update OTP and reset timer
+    pending_users.update_one(
+        {"email": email},
+        {
+            "$set": {
+                "otp": new_otp,
+                "created_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+
+    # Send the new OTP
+    if send_otp_email(email, new_otp):
+        return jsonify({"message": "New OTP sent successfully."})
+
+    return jsonify({"message": "Failed to send OTP"}), 500
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -390,4 +545,5 @@ def recent_activities():
 
 
 if __name__ == "__main__":
+    print(app.url_map)
     app.run(debug=True)
