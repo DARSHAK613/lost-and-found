@@ -664,7 +664,7 @@
                     <div class="profile-avatar" id="profile-avatar">DK</div>
                     <h2 class="profile-name" id="profile-name">Darshak Khedekar</h2>
                     <p class="profile-email" id="profile-email">darshak.khedekar@gamil.com</p>
-                    <span class="badge bg-primary">Student</span>
+                    <span class="badge bg-primary" id="profile-role-badge">Student</span>
                 </div>
 
                 <div class="row">
@@ -673,38 +673,66 @@
                             <h2 class="form-title"><i class="fas fa-user-edit me-2"></i>Personal Information</h2>
                             <form id="profile-form">
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
 
-                                        <label class="form-label">First Name</label>
-                                        <input type="text" id="profile-firstname" class="form-control" required>
+                                    <div id="student-fields">
+
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">First Name</label>
+                                                <input type="text" id="profile-firstname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Last Name</label>
+                                                <input type="text" id="profile-lastname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Email Address</label>
+                                                <input type="email" id="profile-email-input" class="form-control"
+                                                    required>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Phone Number</label>
+                                                <input type="tel" id="profile-phone" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Student ID</label>
+                                                <input type="text" id="profile-studentid" class="form-control" disabled>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Department</label>
+                                                <input type="text" id="profile-department" class="form-control"
+                                                    disabled>
+                                            </div>
+
+                                        </div>
+
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Last Name</label>
-                                        <input type="text" id="profile-lastname" class="form-control" required>
+                                    <div id="admin-fields" class="hidden">
+
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Full Name</label>
+                                                <input type="text" id="admin-fullname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Role</label>
+                                                <input type="text" id="admin-role" class="form-control"
+                                                    value="Administrator" disabled>
+                                            </div>
+
+                                        </div>
 
                                     </div>
 
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email Address</label>
-                                        <input type="email" id="profile-email-input" class="form-control" required>
-
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Phone Number</label>
-                                        <input type="tel" id="profile-phone" class="form-control">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Student ID</label>
-                                        <input type="text" id="profile-studentid" class="form-control" disabled>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Department</label>
-                                        <input type="text" id="profile-department" class="form-control" disabled>
-                                    </div>
 
                                 </div>
                                 <div class="d-grid d-md-flex justify-content-md-end gap-3">
@@ -803,33 +831,6 @@
                         <div class="stat-value">23</div>
                     </div>
                 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 <div class="admin-table-container">
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                         <h2 class="h5 mb-0">User Management</h2>
