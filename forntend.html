@@ -152,6 +152,53 @@
             </div>
         </div>
     </div>
+    <!--email verificationn page -->
+    <div id="email-verification-page" class="auth-container hidden">
+
+        <div class="container mt-5">
+
+            <div class="row justify-content-center">
+
+                <div class="col-md-6">
+
+                    <div class="card shadow p-4">
+
+                        <h2 class="text-center mb-3">
+                            Verify Your Email
+                        </h2>
+
+                        <p class="text-center">
+                            Enter the 6-digit code sent to your email.
+                        </p>
+
+                        <p id="otp-timer" class="text-center text-danger fw-bold mb-3">
+                            OTP expires in 05:00
+                        </p>
+
+                        <input type="text" id="otp-input" class="form-control mb-3" maxlength="6"
+                            placeholder="Enter OTP">
+
+                        <button id="verify-otp-btn" class="btn btn-primary w-100 mb-2">
+
+                            Verify OTP
+
+                        </button>
+
+                        <button id="resend-otp-btn" class="btn btn-outline-secondary w-100">
+
+                            Resend OTP
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
     <!-- Dashboard Layout -->
     <div id="dashboard-container" class="dashboard-container hidden">
