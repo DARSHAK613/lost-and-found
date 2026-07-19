@@ -19,6 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     const adminItem = document.querySelector('.admin-item');
+    const savedRole = localStorage.getItem("role");
+
+    if (savedRole === "admin") {
+        adminItem.classList.remove("hidden");
+    } else {
+        adminItem.classList.add("hidden");
+    }
 
     // Auth elements
     const showRegisterLink = document.getElementById('show-register');
@@ -52,8 +59,56 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadUserProfile() {
 
         const user = JSON.parse(localStorage.getItem("user"));
+        const role = localStorage.getItem("role");
 
         if (!user) return;
+        if (role === "admin") {
+
+            // Show Admin Fields
+            document.getElementById("student-fields").classList.add("hidden");
+            document.getElementById("profile-firstname").required = false;
+            document.getElementById("profile-lastname").required = false;
+            document.getElementById("admin-fields").classList.remove("hidden");
+            document.getElementById("profile-role-badge").innerText = "Administrator";
+
+            // Top Bar
+            document.querySelector(".user-info .fw-bold").innerText =
+                user.fullname;
+
+            document.querySelector(".user-info .small").innerText =
+                user.email;
+
+            // Avatar
+            // Avatar
+            const initials = user.fullname
+                .split(" ")
+                .map(word => word[0].toUpperCase())
+                .join("");
+
+            document.querySelector(".user-avatar").innerText = initials;
+            document.getElementById("profile-avatar").innerText = initials;
+
+            // Profile Header
+            document.getElementById("profile-name").innerText =
+                user.fullname;
+
+            document.getElementById("profile-email").innerText =
+                user.email;
+
+            // Admin Form
+            document.getElementById("admin-fullname").value =
+                user.fullname;
+
+            document.getElementById("profile-email-input").value =
+                user.email;
+
+            return;
+        }
+        document.getElementById("student-fields").classList.remove("hidden");
+        document.getElementById("profile-firstname").required = true;
+        document.getElementById("profile-lastname").required = true;
+        document.getElementById("admin-fields").classList.add("hidden");
+        document.getElementById("profile-role-badge").innerText = "Student";
 
         // Top Bar
         document.querySelector(".user-info .fw-bold").innerText =
@@ -200,101 +255,101 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // verification of otp
     // Verify OTP
-verifyOtpBtn.addEventListener("click", async () => {
+    verifyOtpBtn.addEventListener("click", async () => {
 
-    const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
+        const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
 
-    const response = await fetch("http://127.0.0.1:5000/verify-otp", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            email: pendingUser.email,
-            otp: otpInput.value
-        })
-    });
+        const response = await fetch("http://127.0.0.1:5000/verify-otp", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: pendingUser.email,
+                otp: otpInput.value
+            })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-        alert(data.message);
-        return;
-    }
-
-    alert(data.message);
-
-    localStorage.removeItem("pendingUser");
-
-    showPage(loginPage);
-
-});
-
-
-// Resend OTP
-resendOtpBtn.addEventListener("click", async () => {
-
-    const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
-
-    const response = await fetch("http://127.0.0.1:5000/resend-otp", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            email: pendingUser.email
-        })
-
-    });
-
-    const data = await response.json();
-
-    alert(data.message);
-
-    if (!response.ok) return;
-
-    verifyOtpBtn.disabled = false;
-
-    startOtpTimer();
-
-    startResendTimer();
-
-});
-
-
-// Resend Timer
-let resendCountdown;
-
-function startResendTimer(seconds = 30) {
-
-    clearInterval(resendCountdown);
-
-    let timeLeft = seconds;
-
-    resendOtpBtn.disabled = true;
-
-    resendCountdown = setInterval(() => {
-
-        resendOtpBtn.innerText = `Resend OTP (${timeLeft}s)`;
-
-        if (timeLeft <= 0) {
-
-            clearInterval(resendCountdown);
-
-            resendOtpBtn.disabled = false;
-
-            resendOtpBtn.innerText = "Resend OTP";
-
+        if (!response.ok) {
+            alert(data.message);
+            return;
         }
 
-        timeLeft--;
+        alert(data.message);
 
-    }, 1000);
+        localStorage.removeItem("pendingUser");
 
-}
+        showPage(loginPage);
+
+    });
+
+
+    // Resend OTP
+    resendOtpBtn.addEventListener("click", async () => {
+
+        const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
+
+        const response = await fetch("http://127.0.0.1:5000/resend-otp", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                email: pendingUser.email
+            })
+
+        });
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if (!response.ok) return;
+
+        verifyOtpBtn.disabled = false;
+
+        startOtpTimer();
+
+        startResendTimer();
+
+    });
+
+
+    // Resend Timer
+    let resendCountdown;
+
+    function startResendTimer(seconds = 30) {
+
+        clearInterval(resendCountdown);
+
+        let timeLeft = seconds;
+
+        resendOtpBtn.disabled = true;
+
+        resendCountdown = setInterval(() => {
+
+            resendOtpBtn.innerText = `Resend OTP (${timeLeft}s)`;
+
+            if (timeLeft <= 0) {
+
+                clearInterval(resendCountdown);
+
+                resendOtpBtn.disabled = false;
+
+                resendOtpBtn.innerText = "Resend OTP";
+
+            }
+
+            timeLeft--;
+
+        }, 1000);
+
+    }
 
 
 
@@ -419,21 +474,43 @@ function startResendTimer(seconds = 30) {
 
         if (res.status === 200) {
 
+
             localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("role", data.role);
+            localStorage.removeItem("user");
+            localStorage.removeItem("role");
+            localStorage.setItem("user", JSON.stringify(data.user));
+            localStorage.setItem("role", data.role);
 
-            showPage(dashboardContainer);
+            if (data.role === "admin") {
 
-            showDashboardPage(dashboardPage);
+                adminItem.classList.remove("hidden");
 
-            loadUserProfile();
-            loadRecentActivities();
+                showPage(dashboardContainer);
+                showDashboardPage(adminPanelPage);
+                loadUserProfile();
 
-            loadTotalFoundItems();
-            loadTotalLostItems();
-            loadRecentLostItems();
+            } else {
+
+                adminItem.classList.add("hidden");
+
+                showPage(dashboardContainer);
+
+                showDashboardPage(dashboardPage);
+
+                loadUserProfile();
+                loadRecentActivities();
+
+                loadTotalFoundItems();
+                loadTotalLostItems();
+                loadRecentLostItems();
+
+            }
 
         } else {
+
             alert(data.message);
+
         }
     });
 
@@ -960,6 +1037,40 @@ function startResendTimer(seconds = 30) {
 
             const user = JSON.parse(localStorage.getItem("user"));
 
+            const role = localStorage.getItem("role");
+
+            let bodyData;
+
+            if (role === "admin") {
+
+                bodyData = {
+
+                    fullname: document.getElementById("admin-fullname").value,
+
+                    email: user.email,
+
+                    role: "admin"
+
+                };
+
+            } else {
+
+                bodyData = {
+
+                    firstname: document.getElementById("profile-firstname").value,
+
+                    lastname: document.getElementById("profile-lastname").value,
+
+                    email: user.email,
+
+                    phone: document.getElementById("profile-phone").value,
+
+                    role: "user"
+
+                };
+
+            }
+
             const response = await fetch("http://127.0.0.1:5000/update-profile", {
 
                 method: "PUT",
@@ -968,37 +1079,31 @@ function startResendTimer(seconds = 30) {
                     "Content-Type": "application/json"
                 },
 
-                body: JSON.stringify({
-
-                    firstname: document.getElementById("profile-firstname").value,
-
-                    lastname: document.getElementById("profile-lastname").value,
-
-                    email: user.email,
-
-                    phone: document.getElementById("profile-phone").value
-
-                })
+                body: JSON.stringify(bodyData)
 
             });
 
             const data = await response.json();
+            console.log("Response:", data.user);
 
             alert(data.message);
 
             if (response.ok) {
 
                 localStorage.setItem("user", JSON.stringify(data.user));
+                console.log("Storage:", JSON.parse(localStorage.getItem("user")));
 
                 loadUserProfile();
-                loadRecentActivities();
+
+                if (role === "user") {
+                    loadRecentActivities();
+                }
 
             }
 
         });
 
     }
-
 
 
     const passwordForm = document.getElementById("password-form");
