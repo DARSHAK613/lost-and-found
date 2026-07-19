@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginPage = document.getElementById('login-page');
     const registerPage = document.getElementById('register-page');
     const dashboardContainer = document.getElementById('dashboard-container');
+    const emailVerificationPage = document.getElementById("email-verification-page");
     const dashboardPage = document.getElementById('dashboard-page');
     const reportLostPage = document.getElementById('report-lost-page');
     const reportFoundPage = document.getElementById('report-found-page');
@@ -37,13 +38,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Search elements
     const searchButton = document.getElementById('searchButton');
     const resetFilters = document.getElementById('resetFilters');
-
+    //otp verification
+    const verifyOtpBtn = document.getElementById("verify-otp-btn");
+    const resendOtpBtn = document.getElementById("resend-otp-btn");
+    const otpInput = document.getElementById("otp-input");
+    const otpTimer = document.getElementById("otp-timer");
 
     // Show admin panel if user is admin
 
 
 
-    
+
     function loadUserProfile() {
 
         const user = JSON.parse(localStorage.getItem("user"));
@@ -99,16 +104,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function showPage(pageElement) {
 
-        // Hide all pages
-        loginPage.classList.add('hidden');
-        registerPage.classList.add('hidden');
-        dashboardContainer.classList.add('hidden');
 
-        // Show requested page
-        pageElement.classList.remove('hidden');
+        console.log("Showing:", pageElement);
 
-        // Close mobile menu if open
-        sidebar.classList.remove('active');
+        loginPage.classList.add("hidden");
+        registerPage.classList.add("hidden");
+        dashboardContainer.classList.add("hidden");
+        emailVerificationPage.classList.add("hidden");
+
+        pageElement.classList.remove("hidden");
+
+        console.log("Classes:", pageElement.className);
+
+        sidebar.classList.remove("active");
     }
 
 
@@ -156,6 +164,137 @@ document.addEventListener('DOMContentLoaded', function () {
         showPage(loginPage);
     });
 
+
+    // resend otp
+    let otpCountdown;
+
+    function startOtpTimer(seconds = 300) {
+
+        clearInterval(otpCountdown);
+
+        let timeLeft = seconds;
+
+        otpCountdown = setInterval(() => {
+
+            const minutes = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+
+            otpTimer.innerText =
+                `OTP expires in ${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+
+            if (timeLeft <= 0) {
+
+                clearInterval(otpCountdown);
+
+                otpTimer.innerText = "OTP Expired";
+
+                verifyOtpBtn.disabled = true;
+
+            }
+
+            timeLeft--;
+
+        }, 1000);
+
+    }
+
+    // verification of otp
+    // Verify OTP
+verifyOtpBtn.addEventListener("click", async () => {
+
+    const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
+
+    const response = await fetch("http://127.0.0.1:5000/verify-otp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: pendingUser.email,
+            otp: otpInput.value
+        })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        alert(data.message);
+        return;
+    }
+
+    alert(data.message);
+
+    localStorage.removeItem("pendingUser");
+
+    showPage(loginPage);
+
+});
+
+
+// Resend OTP
+resendOtpBtn.addEventListener("click", async () => {
+
+    const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
+
+    const response = await fetch("http://127.0.0.1:5000/resend-otp", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            email: pendingUser.email
+        })
+
+    });
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    if (!response.ok) return;
+
+    verifyOtpBtn.disabled = false;
+
+    startOtpTimer();
+
+    startResendTimer();
+
+});
+
+
+// Resend Timer
+let resendCountdown;
+
+function startResendTimer(seconds = 30) {
+
+    clearInterval(resendCountdown);
+
+    let timeLeft = seconds;
+
+    resendOtpBtn.disabled = true;
+
+    resendCountdown = setInterval(() => {
+
+        resendOtpBtn.innerText = `Resend OTP (${timeLeft}s)`;
+
+        if (timeLeft <= 0) {
+
+            clearInterval(resendCountdown);
+
+            resendOtpBtn.disabled = false;
+
+            resendOtpBtn.innerText = "Resend OTP";
+
+        }
+
+        timeLeft--;
+
+    }, 1000);
+
+}
 
 
 
@@ -210,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const response = await fetch("http://127.0.0.1:5000/register", {
+        const response = await fetch("http://127.0.0.1:5000/send-otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -228,11 +367,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const data = await response.json();
 
+        if (!response.ok) {
+            alert(data.message);
+            return;
+        }
+
         alert(data.message);
 
-        if (response.ok) {
-            showPage(loginPage);
-        }
+        localStorage.setItem("pendingUser", JSON.stringify({
+            firstname,
+            lastname,
+            email,
+            phone,
+            studentid,
+            department,
+            password
+        }));
+
+        showPage(emailVerificationPage);
+        verifyOtpBtn.disabled = false;
+        startOtpTimer();
+        resendOtpBtn.disabled = true;
+        startResendTimer();
     });
 
 
