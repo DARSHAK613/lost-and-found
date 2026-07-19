@@ -29,6 +29,7 @@ found_items = db["found_items"]
 lost_items = db["lost_items"]
 activity_logs = db["activity_logs"]
 pending_users = db["pending_users"]
+admins = db["admins"]
 
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -232,11 +233,30 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
+
     data = request.get_json()
 
     email = data.get("email", "").strip().lower()
     password = data.get("password", "").strip()
 
+    # ---------- Check Admin First ----------
+    admin = admins.find_one({"email": email})
+
+    if admin:
+
+        if admin["password"] != password:
+            return jsonify({"message": "Incorrect password"}), 401
+
+        return jsonify({
+            "message": "Admin login successful",
+            "role": "admin",
+            "user": {
+                "fullname": admin["fullname"],
+                "email": admin["email"]
+            }
+        }), 200
+
+    # ---------- Check Normal User ----------
     user = users.find_one({"email": email})
 
     if not user:
@@ -247,6 +267,7 @@ def login():
 
     return jsonify({
         "message": "Login successful",
+        "role": "user",
         "user": {
             "firstname": user["firstname"],
             "lastname": user["lastname"],
@@ -258,14 +279,44 @@ def login():
         }
     }), 200
 
-
-
 @app.route("/update-profile", methods=["PUT"])
 def update_profile():
 
     data = request.json
 
     email = data.get("email")
+    role = data.get("role")
+
+    # ---------- ADMIN ----------
+    if role == "admin":
+
+        admins.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "fullname": data.get("fullname"),
+                    "email": data.get("email")
+                }
+            }
+        )
+
+        updated = admins.find_one({"email": email})
+
+        return jsonify({
+
+            "message": "Admin Profile Updated",
+
+            "user": {
+
+                "fullname": updated["fullname"],
+                "email": updated["email"],
+                "role": updated["role"]
+
+            }
+
+        })
+
+    # ---------- STUDENT ----------
 
     users.update_one(
 
@@ -288,8 +339,8 @@ def update_profile():
     )
 
     add_activity(email, "Updated Profile")
+
     updated = users.find_one({"email": email})
-    
 
     return jsonify({
 
@@ -317,7 +368,6 @@ def update_profile():
 
 
 
-
 @app.route("/change-password", methods=["PUT"])
 def change_password():
 
@@ -327,6 +377,28 @@ def change_password():
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
+    # ---------- Check Admin ----------
+    admin = admins.find_one({"email": email})
+
+    if admin:
+
+        if admin["password"] != current_password:
+            return jsonify({"message": "Current password is incorrect"}), 400
+
+        admins.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "password": new_password
+                }
+            }
+        )
+
+        return jsonify({
+            "message": "Admin password changed successfully"
+        })
+
+    # ---------- Check User ----------
     user = users.find_one({"email": email})
 
     if not user:
@@ -343,12 +415,12 @@ def change_password():
             }
         }
     )
+
     add_activity(email, "Changed Password")
 
     return jsonify({
         "message": "Password changed successfully"
     })
-
 
 
 @app.route("/found-item", methods=["POST"])
