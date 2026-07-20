@@ -936,6 +936,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const users = await response.json();
 
+        window.allUsers = users;
+
         const totalUsers = users.length;
 
         const totalStudents = users.filter(user => user.role !== "admin").length;
@@ -953,73 +955,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById("total-blocked").innerText = totalBlocked;
 
-        const tbody = document.getElementById("users-table-body");
-
-        tbody.innerHTML = "";
-
-        users.forEach(user => {
-
-            const role = user.role === "admin"
-                ? "Administrator"
-                : "Student";
-
-            const name =
-                user.fullname ||
-                `${user.firstname} ${user.lastname}`;
-
-            const row = `
-            <tr>
-
-                <td>${user.studentid || "-"}</td>
-
-                <td>${name}</td>
-
-                <td>${user.email}</td>
-
-                <td>${role}</td>
-
-                <td>
-                    <span class="status-badge status-active">
-                        Active
-                    </span>
-                </td>
-
-                <td>
-
-                    <button class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button class="btn btn-sm btn-outline-warning">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <button class="btn btn-sm btn-outline-danger">
-                        <i class="fas fa-ban"></i>
-                    </button>
-
-                </td>
-
-            </tr>
-        `;
-
-            tbody.innerHTML += row;
-
-        });
-
+        renderUsers(users);
     }
     async function loadAdminCount() {
-    try {
-        const response = await fetch("http://127.0.0.1:5000/admin/admin-count");
+        try {
+            const response = await fetch("http://127.0.0.1:5000/admin/admin-count");
 
-        const data = await response.json();
+            const data = await response.json();
 
-        document.getElementById("total-admins").innerText = data.count;
+            document.getElementById("total-admins").innerText = data.count;
 
-    } catch (error) {
-        console.error(error);
+        } catch (error) {
+            console.error(error);
+        }
     }
-}
 
 
 
@@ -1279,4 +1228,156 @@ document.addEventListener('DOMContentLoaded', function () {
         showPage(loginPage);
 
     }
+
+
+
+
+    function renderUsers(users) {
+
+        const tbody = document.getElementById("users-table-body");
+
+        tbody.innerHTML = "";
+
+        users.forEach(user => {
+
+            tbody.innerHTML += `
+        <tr>
+            <td class="text-center">${user.studentid || "-"}</td>
+            <td>${user.fullname}</td>
+            <td>${user.email}</td>
+            <td>${user.role || "Student"}</td>
+            <td>
+                <span class="status-badge status-active">
+                    Active
+                </span>
+            </td>
+
+            <td>
+                <button
+    <button
+    class="btn btn-sm btn-outline-primary view-user-btn"
+    data-id="${user._id}">
+
+    <i class="fas fa-eye"></i>
+
+</button>
+
+                <button class="btn btn-sm btn-outline-warning">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-ban"></i>
+                </button>
+            </td>
+
+        </tr>
+        `;
+
+        });
+        document.querySelectorAll(".view-user-btn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        viewUser(btn.dataset.id);
+
+    });
+
+});
+
+    }
+
+    const searchInput = document.getElementById("user-search");
+
+    document.getElementById("user-search")
+        .addEventListener("input", filterUsers);
+    document.getElementById("role-filter")
+        .addEventListener("change", filterUsers);
+
+    document.getElementById("status-filter")
+        .addEventListener("change", filterUsers);
+
+
+
+    function filterUsers() {
+
+        const searchValue =
+            document.getElementById("user-search").value.toLowerCase();
+
+        const roleValue =
+            document.getElementById("role-filter").value;
+
+        const statusValue =
+            document.getElementById("status-filter").value;
+
+        const filtered = window.allUsers.filter(user => {
+
+            const name =
+                (user.fullname || "").toLowerCase();
+
+            const email =
+                (user.email || "").toLowerCase();
+
+            const studentid =
+                (user.studentid || "").toLowerCase();
+
+            const role =
+                user.role || "user";
+
+            const status =
+                user.status || "active";
+
+            const matchesSearch =
+                name.includes(searchValue) ||
+                email.includes(searchValue) ||
+                studentid.includes(searchValue);
+
+            const matchesRole =
+                roleValue === "all" || role === roleValue;
+
+            const matchesStatus =
+                statusValue === "all" || status === statusValue;
+
+            return matchesSearch && matchesRole && matchesStatus;
+
+        });
+
+        renderUsers(filtered);
+
+    }
+
+    function viewUser(id) {
+
+    const user = window.allUsers.find(u => u._id === id);
+
+    if (!user) return;
+
+    document.getElementById("view-fullname").innerText =
+        user.fullname || "-";
+
+    document.getElementById("view-email").innerText =
+        user.email || "-";
+
+    document.getElementById("view-phone").innerText =
+        user.phone || "-";
+
+    document.getElementById("view-studentid").innerText =
+        user.studentid || "—";
+
+    document.getElementById("view-department").innerText =
+        user.department || "—";
+
+    document.getElementById("view-role").innerText =
+        user.role === "admin"
+            ? "Administrator"
+            : "Student";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("userDetailsModal")
+    );
+
+    modal.show();
+
+}
+
 });
