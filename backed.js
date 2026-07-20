@@ -378,6 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log("Manage Users clicked");
                     console.log(manageUsersPage);
                     showDashboardPage(manageUsersPage, link);
+                    loadUsers();
                     break;
             }
         });
@@ -926,6 +927,99 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+    console.log("JS reached loadUsers definition");
+    async function loadUsers() {
+
+        console.log("loadUsers() called");
+
+        const response = await fetch("http://127.0.0.1:5000/admin/users");
+
+        const users = await response.json();
+
+        const totalUsers = users.length;
+
+        const totalStudents = users.filter(user => user.role !== "admin").length;
+
+        const totalAdmins = users.filter(user => user.role === "admin").length;
+
+        const totalBlocked = users.filter(user => user.status === "blocked").length;
+
+        document.getElementById("total-users").innerText = totalUsers;
+        loadAdminCount();
+
+        document.getElementById("total-students").innerText = totalStudents;
+
+        document.getElementById("total-admins").innerText = totalAdmins;
+
+        document.getElementById("total-blocked").innerText = totalBlocked;
+
+        const tbody = document.getElementById("users-table-body");
+
+        tbody.innerHTML = "";
+
+        users.forEach(user => {
+
+            const role = user.role === "admin"
+                ? "Administrator"
+                : "Student";
+
+            const name =
+                user.fullname ||
+                `${user.firstname} ${user.lastname}`;
+
+            const row = `
+            <tr>
+
+                <td>${user.studentid || "-"}</td>
+
+                <td>${name}</td>
+
+                <td>${user.email}</td>
+
+                <td>${role}</td>
+
+                <td>
+                    <span class="status-badge status-active">
+                        Active
+                    </span>
+                </td>
+
+                <td>
+
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i>
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-warning">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <button class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-ban"></i>
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+            tbody.innerHTML += row;
+
+        });
+
+    }
+    async function loadAdminCount() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/admin/admin-count");
+
+        const data = await response.json();
+
+        document.getElementById("total-admins").innerText = data.count;
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 
 
