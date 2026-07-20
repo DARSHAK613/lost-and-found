@@ -613,7 +613,21 @@ def recent_activities():
 
     return jsonify(activities)
 
+@app.route("/admin/users", methods=["GET"])
+def get_all_users():
 
+    all_users = list(users.find({}, {"password": 0}))
+
+    for user in all_users:
+        user["_id"] = str(user["_id"])
+
+    return jsonify(all_users)
+
+
+@app.route("/admin/admin-count", methods=["GET"])
+def admin_count():
+    count = admins.count_documents({})
+    return jsonify({"count": count})
 
 
 if __name__ == "__main__":
