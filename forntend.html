@@ -214,12 +214,21 @@
                 </button>
             </div>
             <ul class="sidebar-menu">
+
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link active" data-page="dashboard">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
+
+                <li class="sidebar-item admin-item">
+                    <a href="#" class="sidebar-link" id="manage-users-link" data-page="manage-users">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link" data-page="report-lost">
                         <i class="fas fa-plus-circle"></i>
@@ -244,20 +253,22 @@
                         <span>My Profile</span>
                     </a>
                 </li>
-                <li class="sidebar-item admin-item hidden">
-                    <a href="#" class="sidebar-link" data-page="admin-panel">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Admin Panel</span>
-                    </a>
-                </li>
+                
+
                 <li class="sidebar-item mt-4">
                     <a href="#" class="sidebar-link text-danger" id="logout-btn">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>
                 </li>
+
+
+
+
+
             </ul>
         </div>
+        <!--mange user page-->
 
         <!-- Main Content -->
         <div class="main-content">
@@ -798,8 +809,10 @@
 
 
             <!-- Admin Panel Page -->
-            <div id="admin-panel-page" class="page-content hidden">
-                <h1 class="page-title"><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+            <div id="manage-users-page" class="page-content hidden">
+                <h1 class="page-title">
+                    <i class="fas fa-users"></i> Manage Users
+                </h1>
 
                 <div class="stats-container">
                     <div class="stat-card">
