@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const reportFoundPage = document.getElementById('report-found-page');
     const searchItemsPage = document.getElementById('search-items-page');
     const profilePage = document.getElementById('profile-page');
-    const adminPanelPage = document.getElementById('admin-panel-page');
+    const manageUsersPage = document.getElementById("manage-users-page");
 
     // Sidebar elements
     const sidebar = document.getElementById('sidebar');
@@ -51,9 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const otpInput = document.getElementById("otp-input");
     const otpTimer = document.getElementById("otp-timer");
 
+
     // Show admin panel if user is admin
-
-
 
 
     function loadUserProfile() {
@@ -160,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showPage(pageElement) {
 
 
-        console.log("Showing:", pageElement);
+
 
         loginPage.classList.add("hidden");
         registerPage.classList.add("hidden");
@@ -169,7 +168,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         pageElement.classList.remove("hidden");
 
-        console.log("Classes:", pageElement.className);
 
         sidebar.classList.remove("active");
     }
@@ -183,7 +181,8 @@ document.addEventListener('DOMContentLoaded', function () {
         reportFoundPage.classList.add('hidden');
         searchItemsPage.classList.add('hidden');
         profilePage.classList.add('hidden');
-        adminPanelPage.classList.add('hidden');
+        manageUsersPage.classList.add('hidden');
+
 
 
         // Show requested dashboard subpage
@@ -364,19 +363,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     showDashboardPage(dashboardPage, link);
                     break;
                 case 'report-lost':
-                    showDashboardPage(reportLostPage);
+                    showDashboardPage(reportLostPage, link);
                     break;
                 case 'report-found':
-                    showDashboardPage(reportFoundPage);
+                    showDashboardPage(reportFoundPage, link);
                     break;
                 case 'search-items':
-                    showDashboardPage(searchItemsPage);
+                    showDashboardPage(searchItemsPage, link);
                     break;
                 case 'profile':
-                    showDashboardPage(profilePage);
+                    showDashboardPage(profilePage, link);
                     break;
-                case 'admin-panel':
-                    showDashboardPage(adminPanelPage);
+                case 'manage-users':
+                    console.log("Manage Users clicked");
+                    console.log(manageUsersPage);
+                    showDashboardPage(manageUsersPage, link);
                     break;
             }
         });
@@ -470,15 +471,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const data = await res.json();
 
-        console.log(data);
+
 
         if (res.status === 200) {
 
 
-            localStorage.setItem("user", JSON.stringify(data.user));
-            localStorage.setItem("role", data.role);
-            localStorage.removeItem("user");
-            localStorage.removeItem("role");
             localStorage.setItem("user", JSON.stringify(data.user));
             localStorage.setItem("role", data.role);
 
@@ -487,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 adminItem.classList.remove("hidden");
 
                 showPage(dashboardContainer);
-                showDashboardPage(adminPanelPage);
+                showDashboardPage(manageUsersPage);
                 loadUserProfile();
 
             } else {
@@ -846,18 +843,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const now = new Date();
         const activityTime = new Date(time);
 
-        console.log("NOW:", now);
-        console.log("ACTIVITY:", activityTime);
+
 
         const diff = now - activityTime;
 
-        console.log("DIFF (ms):", diff);
+        ;
 
         const seconds = Math.floor(diff / 1000);
-        console.log("SECONDS:", seconds);
+        ;
 
         const minutes = Math.floor(seconds / 60);
-        console.log("MINUTES:", minutes);
+
 
         if (seconds < 60) return "Just now";
 
@@ -865,7 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
 
         const hours = Math.floor(minutes / 60);
-        console.log("HOURS:", hours);
+
 
         if (hours < 24)
             return `${hours} hour${hours > 1 ? "s" : ""} ago`;
@@ -904,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function () {
         list.innerHTML = "";
 
         activities.forEach(activity => {
-            console.log(activity);
+
 
             list.innerHTML += `
 
@@ -1003,7 +999,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     function openFoundReport(itemName, category, location) {
-        console.log("openFoundReport called");
+
         // Open the Report Found Item page
         showDashboardPage(reportFoundPage);   // If your project uses another function, tell me.
 
@@ -1084,14 +1080,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const data = await response.json();
-            console.log("Response:", data.user);
+
 
             alert(data.message);
 
             if (response.ok) {
 
                 localStorage.setItem("user", JSON.stringify(data.user));
-                console.log("Storage:", JSON.parse(localStorage.getItem("user")));
+
 
                 loadUserProfile();
 
@@ -1170,17 +1166,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
         showPage(dashboardContainer);
 
-        showDashboardPage(dashboardPage);
+        const role = localStorage.getItem("role");
+
+        if (role === "admin") {
+            showDashboardPage(manageUsersPage);
+        } else {
+            showDashboardPage(dashboardPage);
+        }
 
         loadUserProfile();
 
         loadTotalFoundItems();
-
         loadTotalLostItems();
-
         loadRecentLostItems();
         loadRecentActivities();
-
     } else {
 
         showPage(loginPage);
