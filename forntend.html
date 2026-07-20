@@ -815,34 +815,39 @@
                 </h1>
 
                 <div class="stats-container">
+
                     <div class="stat-card">
                         <div class="stat-icon primary">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stat-title">TOTAL USERS</div>
-                        <div class="stat-value">156</div>
+                        <div class="stat-value" id="total-users">0</div>
                     </div>
+
                     <div class="stat-card">
                         <div class="stat-icon success">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-user-graduate"></i>
                         </div>
-                        <div class="stat-title">TOTAL REPORTS</div>
-                        <div class="stat-value">287</div>
+                        <div class="stat-title">TOTAL STUDENTS</div>
+                        <div class="stat-value" id="total-students">0</div>
                     </div>
+
                     <div class="stat-card">
                         <div class="stat-icon warning">
-                            <i class="fas fa-check-circle"></i>
+                            <i   class="fas fa-user-shield"></i>
                         </div>
-                        <div class="stat-title">ITEMS RETURNED</div>
-                        <div class="stat-value">94</div>
+                        <div class="stat-title">TOTAL ADMIN</div>
+                        <div class="stat-value" id="total-admins">0</div>
                     </div>
+
                     <div class="stat-card">
                         <div class="stat-icon danger">
-                            <i class="fas fa-exclamation-triangle"></i>
+                            <i class="fas fa-user-slash"></i>
                         </div>
-                        <div class="stat-title">PENDING VERIFICATION</div>
-                        <div class="stat-value">23</div>
+                        <div class="stat-title">PENDING BLOCKED</div>
+                        <div class="stat-value" id="total-blocked">0</div>
                     </div>
+
                 </div>
                 <div class="admin-table-container">
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -861,82 +866,13 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#S12345678</td>
-                                    <td>John Smith</td>
-                                    <td>john.smith@example.com</td>
-                                    <td>Student</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#S87654321</td>
-                                    <td>Sarah Johnson</td>
-                                    <td>sarah.j@example.com</td>
-                                    <td>Student</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#F24681357</td>
-                                    <td>Michael Chen</td>
-                                    <td>m.chen@example.com</td>
-                                    <td>Faculty</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#S13579246</td>
-                                    <td>Alex Rodriguez</td>
-                                    <td>alex.r@example.com</td>
-                                    <td>Student</td>
-                                    <td><span class="status-badge status-pending">Pending</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#A97531246</td>
-                                    <td>Jessica Williams</td>
-                                    <td>j.williams@example.com</td>
-                                    <td>Admin</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-warning"><i
-                                                class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-ban"></i></button>
-                                    </td>
-                                </tr>
+                            <tbody id="users-table-body">
+                                
+
+
+
+
+                                
                             </tbody>
                         </table>
                     </div>
