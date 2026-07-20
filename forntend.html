@@ -253,7 +253,7 @@
                         <span>My Profile</span>
                     </a>
                 </li>
-                
+
 
                 <li class="sidebar-item mt-4">
                     <a href="#" class="sidebar-link text-danger" id="logout-btn">
@@ -834,7 +834,7 @@
 
                     <div class="stat-card">
                         <div class="stat-icon warning">
-                            <i   class="fas fa-user-shield"></i>
+                            <i class="fas fa-user-shield"></i>
                         </div>
                         <div class="stat-title">TOTAL ADMIN</div>
                         <div class="stat-value" id="total-admins">0</div>
@@ -849,11 +849,41 @@
                     </div>
 
                 </div>
+
+                        
                 <div class="admin-table-container">
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                         <h2 class="h5 mb-0">User Management</h2>
                         <button class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i> Add User</button>
                     </div>
+
+                        <div class="p-3 border-bottom">
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <input type="text" id="user-search" class="form-control"
+                                        placeholder="Search by Name, Email or Student ID">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <select id="role-filter" class="form-select">
+                                        <option value="all">All Roles</option>
+                                        <option value="user">Students</option>
+                                        <option value="admin">Admins</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <select id="status-filter" class="form-select">
+                                        <option value="all">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="blocked">Blocked</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
@@ -866,18 +896,14 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
+
+
                             <tbody id="users-table-body">
-                                
-
-
-
-
-                                
                             </tbody>
                         </table>
                     </div>
                 </div>
-
+                <!--
                 <div class="admin-table-container mt-4">
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                         <h2 class="h5 mb-0">Report Management</h2>
@@ -984,11 +1010,91 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
+
+
+    <!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="fas fa-user-circle me-2"></i>
+                    User Details
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Full Name</strong>
+                        <p id="view-fullname"></p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Email</strong>
+                        <p id="view-email"></p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Phone</strong>
+                        <p id="view-phone"></p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Student ID</strong>
+                        <p id="view-studentid"></p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Department</strong>
+                        <p id="view-department"></p>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <strong>Role</strong>
+                        <p id="view-role"></p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="backed.js"></script>
 
 </html>
