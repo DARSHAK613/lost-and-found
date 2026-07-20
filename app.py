@@ -616,10 +616,23 @@ def recent_activities():
 @app.route("/admin/users", methods=["GET"])
 def get_all_users():
 
-    all_users = list(users.find({}, {"password": 0}))
+    # Students
+    student_users = list(users.find({}, {"password": 0}))
 
-    for user in all_users:
+    for user in student_users:
         user["_id"] = str(user["_id"])
+        user["role"] = "user"
+
+    # Admins
+    admin_users = list(admins.find({}, {"password": 0}))
+
+    for admin in admin_users:
+        admin["_id"] = str(admin["_id"])
+        admin["studentid"] = "*"
+        admin["department"] = "*"
+
+    # Merge both
+    all_users = student_users + admin_users
 
     return jsonify(all_users)
 
