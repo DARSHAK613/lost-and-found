@@ -12,20 +12,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchItemsPage = document.getElementById('search-items-page');
     const profilePage = document.getElementById('profile-page');
     const manageUsersPage = document.getElementById("manage-users-page");
+    const reportManagementPage = document.getElementById("report-management-page");
 
     // Sidebar elements
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    const adminItem = document.querySelector('.admin-item');
-    const savedRole = localStorage.getItem("role");
+    const adminItems = document.querySelectorAll('.admin-item');
+    function updateAdminMenu() {
 
-    if (savedRole === "admin") {
-        adminItem.classList.remove("hidden");
-    } else {
-        adminItem.classList.add("hidden");
+        const role = localStorage.getItem("role");
+
+        adminItems.forEach(item => {
+
+            if (role === "admin") {
+                item.classList.remove("hidden");
+            } else {
+                item.classList.add("hidden");
+            }
+
+        });
+
     }
+    updateAdminMenu();
 
     // Auth elements
     const showRegisterLink = document.getElementById('show-register');
@@ -182,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
         searchItemsPage.classList.add('hidden');
         profilePage.classList.add('hidden');
         manageUsersPage.classList.add('hidden');
+        reportManagementPage.classList.add('hidden');
 
 
 
@@ -214,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
 
         localStorage.removeItem("user"); // IMPORTANT
+        updateAdminMenu();
 
         showPage(loginPage);
     });
@@ -380,6 +392,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     showDashboardPage(manageUsersPage, link);
                     loadUsers();
                     break;
+                case "report-management":
+
+                    showDashboardPage(reportManagementPage);
+
+                    loadReports();
+
+                    break;
             }
         });
     });
@@ -480,17 +499,33 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem("user", JSON.stringify(data.user));
             localStorage.setItem("role", data.role);
 
+            updateAdminMenu();
+
             if (data.role === "admin") {
 
-                adminItem.classList.remove("hidden");
+                adminItems.forEach(item => {
+                    item.classList.remove("hidden");
+                });
 
                 showPage(dashboardContainer);
                 showDashboardPage(manageUsersPage);
                 loadUserProfile();
 
+                // Dashboard Data
+                loadTotalFoundItems();
+                loadTotalLostItems();
+                loadRecentLostItems();
+                loadRecentActivities();
+
+                loadUsers();
+                loadReports();
+                loadAdminCount();
+
             } else {
 
-                adminItem.classList.add("hidden");
+                adminItems.forEach(item => {
+                    item.classList.add("hidden");
+                });
 
                 showPage(dashboardContainer);
 
@@ -502,6 +537,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 loadTotalFoundItems();
                 loadTotalLostItems();
                 loadRecentLostItems();
+
+
 
             }
 
@@ -969,7 +1006,123 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(error);
         }
     }
+    async function loadReports() {
+        const response = await fetch("http://127.0.0.1:5000/admin/reports");
 
+        const reports = await response.json();
+        const tbody = document.getElementById("reports-table-body");
+
+        tbody.innerHTML = "";
+        reports.forEach(report => {
+
+            const badge =
+                report.type === "Lost"
+                    ? '<span class="badge bg-danger">Lost</span>'
+                    : '<span class="badge bg-success">Found</span>';
+
+            const row = `
+
+        <tr>
+
+            <td>${report.item_name}</td>
+
+            <td>${badge}</td>
+
+            <td>${report.fullname || "Unknown User"}</td>
+
+            <td>${report.date_lost || report.date_found || "-"}</td>
+
+            <td>
+
+                <span class="status-badge status-active">
+                    ${report.status}
+                </span>
+
+            </td>
+
+            <td>
+                <button class="btn btn-sm btn-outline-primary view-report-btn">
+                    <i class="fas fa-eye"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-check"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-times"></i>
+                </button>
+
+            </td>
+
+        </tr>
+
+    `;
+
+            tbody.insertAdjacentHTML("beforeend", row);
+            const lastRow = tbody.lastElementChild;
+
+            lastRow.querySelector(".view-report-btn")
+                .addEventListener("click", () => {
+                    console.log(report);
+                    viewReport(report);
+                });
+
+        });
+
+    }
+    console.log("Reached viewReport");
+    window.viewReport = function (report) {
+        document.getElementById("report-item-name").innerText = report.item_name;
+
+        document.getElementById("report-category").innerText = report.category;
+
+        document.getElementById("report-type").innerText = report.type;
+
+        document.getElementById("report-status").innerText = report.status;
+
+        document.getElementById("report-user").innerText =
+            report.fullname || "Unknown User";
+
+        document.getElementById("report-studentid").innerText =
+            report.studentid || "-";
+
+        document.getElementById("report-department").innerText =
+            report.department || "-";
+
+        document.getElementById("report-phone").innerText =
+            report.phone || "-";
+
+        document.getElementById("report-location").innerText =
+            report.location_lost || report.location_found;
+
+        document.getElementById("report-date").innerText =
+            report.date_lost || report.date_found;
+
+        document.getElementById("report-description").innerText =
+            report.description;
+
+        const img = document.getElementById("report-image");
+
+        if (report.image) {
+
+            img.src = "../images/" + report.image;
+
+            img.style.display = "block";
+
+        } else {
+
+            img.style.display = "none";
+
+        }
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("viewReportModal")
+        );
+
+        modal.show();
+
+    }
 
 
 
@@ -1247,13 +1400,26 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>${user.email}</td>
             <td>${user.role || "Student"}</td>
             <td>
-                <span class="status-badge status-active">
-                    Active
-                </span>
-            </td>
+
+    ${user.status === "blocked"
+
+                    ?
+
+                    `<span class="status-badge status-pending">
+            Blocked
+        </span>`
+
+                    :
+
+                    `<span class="status-badge status-active">
+            Active
+        </span>`
+                }
+
+</td>
 
             <td>
-                <button
+                
     <button
     class="btn btn-sm btn-outline-primary view-user-btn"
     data-id="${user._id}">
@@ -1265,10 +1431,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="btn btn-sm btn-outline-warning">
                     <i class="fas fa-edit"></i>
                 </button>
+${user.status === "blocked"
 
-                <button class="btn btn-sm btn-outline-danger">
-                    <i class="fas fa-ban"></i>
-                </button>
+                    ?
+
+                    `<button
+        class="btn btn-sm btn-outline-success unblock-user-btn"
+        data-id="${user._id}">
+
+        <i class="fas fa-check"></i>
+
+    </button>`
+
+                    :
+
+                    `<button
+        class="btn btn-sm btn-outline-danger block-user-btn"
+        data-id="${user._id}">
+
+        <i class="fas fa-ban"></i>
+
+    </button>`
+                }
             </td>
 
         </tr>
@@ -1277,13 +1461,31 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         document.querySelectorAll(".view-user-btn").forEach(btn => {
 
-    btn.addEventListener("click", () => {
+            btn.addEventListener("click", () => {
 
-        viewUser(btn.dataset.id);
+                viewUser(btn.dataset.id);
 
-    });
+            });
 
-});
+        });
+        document.querySelectorAll(".block-user-btn").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                openBlockModal(btn.dataset.id);
+
+            });
+
+        });
+        document.querySelectorAll(".unblock-user-btn").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                unblockUser(btn.dataset.id);
+
+            });
+
+        });
 
     }
 
@@ -1348,36 +1550,130 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function viewUser(id) {
 
-    const user = window.allUsers.find(u => u._id === id);
+        const user = window.allUsers.find(u => u._id === id);
 
-    if (!user) return;
+        if (!user) return;
 
-    document.getElementById("view-fullname").innerText =
-        user.fullname || "-";
+        document.getElementById("view-fullname").innerText =
+            user.fullname || "-";
 
-    document.getElementById("view-email").innerText =
-        user.email || "-";
+        document.getElementById("view-email").innerText =
+            user.email || "-";
 
-    document.getElementById("view-phone").innerText =
-        user.phone || "-";
+        document.getElementById("view-phone").innerText =
+            user.phone || "-";
 
-    document.getElementById("view-studentid").innerText =
-        user.studentid || "—";
+        document.getElementById("view-studentid").innerText =
+            user.studentid || "—";
 
-    document.getElementById("view-department").innerText =
-        user.department || "—";
+        document.getElementById("view-department").innerText =
+            user.department || "—";
 
-    document.getElementById("view-role").innerText =
-        user.role === "admin"
-            ? "Administrator"
-            : "Student";
+        document.getElementById("view-role").innerText =
+            user.role === "admin"
+                ? "Administrator"
+                : "Student";
 
-    const modal = new bootstrap.Modal(
-        document.getElementById("userDetailsModal")
-    );
+        const modal = new bootstrap.Modal(
+            document.getElementById("userDetailsModal")
+        );
 
-    modal.show();
+        modal.show();
 
-}
+    }
+    function openBlockModal(id) {
+
+        document.getElementById("block-user-id").value = id;
+
+        document.getElementById("block-reason").value = "";
+
+        document.getElementById("block-note").value = "";
+
+        document.getElementById("send-email").checked = true;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("blockUserModal")
+        );
+
+        modal.show();
+
+    }
+
+
+    document.getElementById("confirm-block-btn")
+        .addEventListener("click", async () => {
+
+            const userId = document.getElementById("block-user-id").value;
+
+            const reason = document.getElementById("block-reason").value;
+
+            const note = document.getElementById("block-note").value;
+
+            if (reason === "") {
+
+                alert("Please select a reason.");
+
+                return;
+
+            }
+
+            const response = await fetch(
+                "http://127.0.0.1:5000/admin/block-user",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        user_id: userId,
+                        reason: reason,
+                        note: note
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            alert(result.message);
+
+            bootstrap.Modal.getInstance(
+                document.getElementById("blockUserModal")
+            ).hide();
+
+            loadUsers();
+
+        });
+
+
+    async function unblockUser(id) {
+
+        if (!confirm("Are you sure you want to unblock this user?")) {
+            return;
+        }
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/admin/unblock-user",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    user_id: id
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        alert(result.message);
+
+        loadUsers();
+
+    }
 
 });
