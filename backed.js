@@ -620,39 +620,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const imageInput = document.getElementById("lostItemImage");
 
-            let image = "";
             const user = JSON.parse(localStorage.getItem("user"));
 
+            const formData = new FormData();
+
+            formData.append("item_name", document.getElementById("lost-item-name").value);
+            formData.append("category", document.getElementById("lost-category").value);
+            formData.append("date_lost", document.getElementById("lost-date").value);
+            formData.append("location_lost", document.getElementById("lost-location").value);
+            formData.append("description", document.getElementById("lost-description").value);
+            formData.append("email", user.email);
+
             if (imageInput.files.length > 0) {
-                image = imageInput.files[0].name;
+                formData.append("image", imageInput.files[0]);
             }
 
             const response = await fetch("http://127.0.0.1:5000/lost-item", {
-
                 method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    item_name: document.getElementById("lost-item-name").value,
-
-                    category: document.getElementById("lost-category").value,
-
-                    date_lost: document.getElementById("lost-date").value,
-
-                    location_lost: document.getElementById("lost-location").value,
-
-                    description: document.getElementById("lost-description").value,
-
-                    image: image,
-
-                    email: user.email
-
-                })
-
+                body: formData
             });
 
             const data = await response.json();
@@ -684,69 +669,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const foundForm = document.getElementById("found-item-form");
 
-    if (foundForm) {
+if (foundForm) {
 
-        foundForm.addEventListener("submit", async (e) => {
+    foundForm.addEventListener("submit", async (e) => {
 
-            e.preventDefault();
-            const user = JSON.parse(localStorage.getItem("user"));
+        e.preventDefault();
 
-            const imageInput = document.getElementById("foundItemImage");
+        const user = JSON.parse(localStorage.getItem("user"));
 
-            let image = "";
+        const imageInput = document.getElementById("foundItemImage");
 
+        const formData = new FormData();
 
-            if (imageInput.files.length > 0) {
-                image = imageInput.files[0].name;
-            }
+        formData.append("item_name", document.getElementById("found-item-name").value);
+        formData.append("category", document.getElementById("found-category").value);
+        formData.append("date_found", document.getElementById("found-date").value);
+        formData.append("location_found", document.getElementById("found-location").value);
+        formData.append("description", document.getElementById("found-description").value);
+        formData.append("email", user.email);
 
-            const response = await fetch("http://127.0.0.1:5000/found-item", {
+        if (imageInput.files.length > 0) {
+            formData.append("image", imageInput.files[0]);
+        }
 
+        const response = await fetch(
+            "http://127.0.0.1:5000/found-item",
+            {
                 method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    item_name: document.getElementById("found-item-name").value,
-
-                    category: document.getElementById("found-category").value,
-
-                    date_found: document.getElementById("found-date").value,
-
-                    location_found: document.getElementById("found-location").value,
-
-                    description: document.getElementById("found-description").value,
-
-                    image: image,
-
-                    email: user.email
-
-                })
-
-            });
-
-            const data = await response.json();
-
-            alert(data.message);
-
-            if (response.ok) {
-
-                foundForm.reset();
-
-                foundImagePreview.style.display = "none";
-                loadTotalFoundItems();
-                loadRecentActivities();
-                showDashboardPage(dashboardPage);
-
+                body: formData
             }
+        );
 
-        });
+        const data = await response.json();
 
-    }
+        alert(data.message);
 
+        if (response.ok) {
+
+            foundForm.reset();
+
+            foundImagePreview.style.display = "none";
+
+            loadTotalFoundItems();
+
+            loadRecentActivities();
+
+            showDashboardPage(dashboardPage);
+
+        }
+
+    });
+
+}
 
 
     const quickLostForm = document.getElementById("quick-lost-form");
@@ -1106,7 +1080,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (report.image) {
 
-            img.src = "../images/" + report.image;
+            img.src = "http://127.0.0.1:5000/uploads/" + report.image;
 
             img.style.display = "block";
 
