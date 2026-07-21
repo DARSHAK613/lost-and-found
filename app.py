@@ -5,15 +5,24 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
 from datetime import timedelta
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
+
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson.codec_options import CodecOptions
 from bson import ObjectId
+from werkzeug.utils import secure_filename
+import os
 
 
 app = Flask(__name__)
 CORS(app)
+
+UPLOAD_FOLDER = "uploads"
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 
@@ -500,8 +509,14 @@ def change_password():
 @app.route("/found-item", methods=["POST"])
 def found_item():
 
-    data = request.json
-    print(data)
+    data = request.form
+
+    image = request.files.get("image")
+    filename = ""
+
+    if image:
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
     found_items.insert_one({
 
@@ -517,11 +532,12 @@ def found_item():
 
         "description": data.get("description"),
 
-        "image": data.get("image"),
+        "image": filename,
 
         "status": "Found"
 
     })
+
     add_activity(data.get("email"), "Reported Found Item")
 
     return jsonify({
@@ -529,12 +545,17 @@ def found_item():
     })
 
 
-
 @app.route("/lost-item", methods=["POST"])
 def lost_item():
 
-    data = request.json
-    print(data)
+    data = request.form
+
+    image = request.files.get("image")
+    filename = ""
+
+    if image:
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
     lost_items.insert_one({
 
@@ -550,7 +571,7 @@ def lost_item():
 
         "description": data.get("description"),
 
-        "image": data.get("image"),
+        "image": filename,
 
         "status": "Lost"
 
@@ -843,6 +864,10 @@ def admin_count():
     count = admins.count_documents({})
     return jsonify({"count": count})
 
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == "__main__":
     print(app.url_map)
