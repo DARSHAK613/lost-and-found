@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
 from bson.codec_options import CodecOptions
+from bson import ObjectId
 
 
 app = Flask(__name__)
@@ -88,6 +89,69 @@ Lost & Found Team
     except Exception as e:
         print("Email Error:", e)
         return False
+    
+
+def send_account_status_email(receiver_email, fullname, status, reason="", note=""):
+
+    if status == "blocked":
+        subject = "Your Lost & Found Account Has Been Blocked"
+
+        body = f"""
+Hello {fullname},
+
+Your Lost & Found account has been blocked by the administrator.
+
+Reason:
+{reason}
+
+Additional Note:
+{note if note else "No additional note."}
+
+If you believe this is a mistake, please contact the administrator.
+
+Regards,
+Lost & Found Team
+"""
+
+    else:
+        subject = "Your Lost & Found Account Has Been Reactivated"
+
+        body = f"""
+Hello {fullname},
+
+Your account has been reactivated.
+
+You can now log in again.
+
+Regards,
+Lost & Found Team
+"""
+
+    message = MIMEMultipart()
+    message["From"] = EMAIL_ADDRESS
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(body, "plain"))
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+        server.sendmail(
+            EMAIL_ADDRESS,
+            receiver_email,
+            message.as_string()
+        )
+
+        server.quit()
+
+        return True
+
+    except Exception as e:
+        print("Email Error:", e)
+        return False
 
 @app.route("/")
 def home():
@@ -160,7 +224,12 @@ def verify_otp():
         "phone": pending_user["phone"],
         "studentid": pending_user["studentid"],
         "department": pending_user["department"],
-        "password": pending_user["password"]
+        "password": pending_user["password"],
+
+        "status": "active",
+    "blocked_reason": "",
+    "blocked_by": "",
+    "blocked_date": ""
     })
 
     pending_users.delete_one({"email": email})
@@ -224,7 +293,12 @@ def register():
         "phone": phone,
         "studentid": studentid,
         "department": department,
-        "password": password
+        "password": password,
+
+        "status": "active",
+    "blocked_reason": "",
+    "blocked_by": "",
+    "blocked_date": ""
     })
 
     return jsonify({"message": "Registration Successful"})
@@ -427,8 +501,11 @@ def change_password():
 def found_item():
 
     data = request.json
+    print(data)
 
     found_items.insert_one({
+
+        "email": data.get("email"),
 
         "item_name": data.get("item_name"),
 
@@ -457,8 +534,11 @@ def found_item():
 def lost_item():
 
     data = request.json
+    print(data)
 
     lost_items.insert_one({
+
+        "email": data.get("email"),
 
         "item_name": data.get("item_name"),
 
@@ -490,6 +570,8 @@ def quick_lost_item():
 
     lost_items.insert_one({
 
+        "email": data.get("email"),
+
         "item_name": data.get("item_name"),
 
         "category": "Not Specified",
@@ -519,6 +601,8 @@ def quick_found_item():
     data = request.json
 
     found_items.insert_one({
+
+        "email": data.get("email"),
 
         "item_name": data.get("item_name"),
 
@@ -636,6 +720,123 @@ def get_all_users():
 
     return jsonify(all_users)
 
+
+@app.route("/admin/block-user", methods=["POST"])
+def block_user():
+
+    data = request.json
+
+    user_id = data["user_id"]
+    reason = data["reason"]
+    note = data["note"]
+
+    user = users.find_one({"_id": ObjectId(user_id)})
+
+    if user:
+
+        send_account_status_email(
+        user["email"],
+        user["fullname"],
+        "blocked",
+        reason,
+        note
+    )
+
+    users.update_one(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "status": "blocked",
+                "blocked_reason": reason,
+                "blocked_by": "Administrator",
+                "blocked_date": datetime.now().strftime("%d-%m-%Y"),
+                "block_note": note
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "User blocked successfully."
+    })
+
+
+@app.route("/admin/unblock-user", methods=["POST"])
+def unblock_user():
+
+    print("UNBLOCK API CALLED")
+
+    data = request.json
+
+    user_id = data["user_id"]
+
+    user = users.find_one({"_id": ObjectId(user_id)})
+
+    if user:
+
+        send_account_status_email(
+        user["email"],
+        user["fullname"],
+        "active"
+    )
+
+    users.update_one(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "status": "active",
+                "blocked_reason": "",
+                "blocked_by": "",
+                "blocked_date": "",
+                "block_note": ""
+            }
+        }
+    )
+
+    return jsonify({
+        "success": True,
+        "message": "User unblocked successfully."
+    })
+
+
+@app.route("/admin/reports", methods=["GET"])
+def get_all_reports():
+
+    reports = []
+
+    # Lost reports
+    for report in lost_items.find():
+
+        report["_id"] = str(report["_id"])
+        report["type"] = "Lost"
+
+        user = users.find_one({"email": report.get("email")})
+
+        if user:
+            report["fullname"] = f'{user.get("firstname","")} {user.get("lastname","")}'
+            report["studentid"] = user.get("studentid", "")
+            report["department"] = user.get("department", "")
+            report["phone"] = user.get("phone", "")
+
+        reports.append(report)
+
+    # Found reports
+    for report in found_items.find():
+
+        report["_id"] = str(report["_id"])
+        report["type"] = "Found"
+
+        user = users.find_one({"email": report.get("email")})
+
+        if user:
+            report["fullname"] = f'{user.get("firstname","")} {user.get("lastname","")}'
+            report["studentid"] = user.get("studentid", "")
+            report["department"] = user.get("department", "")
+            report["phone"] = user.get("phone", "")
+
+        reports.append(report)
+
+    return jsonify(reports)
 
 @app.route("/admin/admin-count", methods=["GET"])
 def admin_count():
