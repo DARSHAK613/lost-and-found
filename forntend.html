@@ -217,11 +217,11 @@
 
                 <li class="sidebar-item">
                     <div class="user-only">
-                    <a href="#" class="sidebar-link active" data-page="dashboard">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </div>
+                        <a href="#" class="sidebar-link active" data-page="dashboard">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
                 </li>
 
                 <li class="sidebar-item admin-item">
@@ -239,18 +239,18 @@
                 </li>
 
                 <div class="user-only">
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link" data-page="report-lost">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Report Lost Item</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link" data-page="report-found">
-                        <i class="fas fa-plus-square"></i>
-                        <span>Report Found Item</span>
-                    </a>
-                </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="report-lost">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Report Lost Item</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="report-found">
+                            <i class="fas fa-plus-square"></i>
+                            <span>Report Found Item</span>
+                        </a>
+                    </li>
                 </div>
 
                 <li class="sidebar-item">
@@ -338,70 +338,72 @@
 
                 </div>
 
-            <div class="user-only">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="form-section">
-                            <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Quick Report Lost Item</h2>
+                <div class="user-only">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="form-section">
+                                <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Quick Report Lost Item
+                                </h2>
 
-                            <form id="quick-lost-form">
-                                <div class="mb-3">
-                                    <label class="form-label">Item Name</label>
-                                    <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone"
-                                        required id="quick-lost-name">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Location Lost</label>
-                                    <input type="text" class="form-control" id="quick-lost-location"
-                                        placeholder="e.g., Library, Cafeteria, Main Building" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" rows="3" id="quick-lost-description"
-                                        placeholder="Brief description of the item"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Report Lost Item</button>
-                            </form>
+                                <form id="quick-lost-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Item Name</label>
+                                        <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone"
+                                            required id="quick-lost-name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location Lost</label>
+                                        <input type="text" class="form-control" id="quick-lost-location"
+                                            placeholder="e.g., Library, Cafeteria, Main Building" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" rows="3" id="quick-lost-description"
+                                            placeholder="Brief description of the item"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Report Lost Item</button>
+                                </form>
 
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-section">
+                                <h2 class="form-title"><i class="fas fa-plus-square me-2"></i>Quick Report Found Item
+                                </h2>
+
+                                <form id="quick-found-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Item Name</label>
+                                        <input type="text" class="form-control" id="quick-found-name"
+                                            placeholder="e.g., Backpack, Water Bottle, ID Card" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location Found</label>
+                                        <input type="text" class="form-control" id="quick-found-location"
+                                            placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" rows="3" id="quick-found-description"
+                                            placeholder="Brief description of the item"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Report Found Item</button>
+                                </form>
+
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="form-section">
-                            <h2 class="form-title"><i class="fas fa-plus-square me-2"></i>Quick Report Found Item</h2>
+                </div>
 
-                            <form id="quick-found-form">
-                                <div class="mb-3">
-                                    <label class="form-label">Item Name</label>
-                                    <input type="text" class="form-control" id="quick-found-name"
-                                        placeholder="e.g., Backpack, Water Bottle, ID Card" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Location Found</label>
-                                    <input type="text" class="form-control" id="quick-found-location"
-                                        placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" rows="3" id="quick-found-description"
-                                        placeholder="Brief description of the item"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-success w-100">Report Found Item</button>
-                            </form>
+                <div class="user-only">
+                    <div class="form-section">
+                        <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
+                        <div class="row" id="recent-lost-items-container">
 
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="user-only">
-                <div class="form-section">
-                    <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
-                    <div class="row" id="recent-lost-items-container">
 
-                    </div>
-                </div>
-            </div>
-                
             </div>
 
             <!-- Report Lost Item Page -->
@@ -409,7 +411,8 @@
                 <h1 class="page-title">
                     <i class="fas fa-plus-circle">
 
-                    </i> Report Lost Item</h1>
+                    </i> Report Lost Item
+                </h1>
                 <div class="form-section">
                     <form id="lost-item-form">
 
@@ -1079,8 +1082,8 @@
 
 
 
-                
-                
+
+
                 <div class="admin-table-container">
 
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -1135,25 +1138,23 @@
                         <table class="table table-hover mb-0">
 
                             <thead>
-
                                 <tr>
 
-                                    <th>Image</th>
-
-                                    <th>Item Name</th>
+                                    <th>Reporter name</th>
 
                                     <th>Type</th>
 
-                                    <th>Reporter</th>
+                                    <th>Item Name</th>
 
-                                    <th>Department</th>
+                                    <th>Category</th>
 
                                     <th>Status</th>
+
+                                    <th>Report Date</th>
 
                                     <th>Actions</th>
 
                                 </tr>
-
                             </thead>
 
                             <tbody id="reports-table-body">
