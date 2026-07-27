@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     const adminItems = document.querySelectorAll('.admin-item');
+    const userOnlySections = document.querySelectorAll(".user-only");
+
     function updateAdminMenu() {
 
         const role = localStorage.getItem("role");
@@ -34,7 +36,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
         });
 
+        userOnlySections.forEach(section => {
+
+            if (role === "admin") {
+                section.classList.add("hidden");
+            } else {
+                section.classList.remove("hidden");
+            }
+
+        });
+
     }
+
     updateAdminMenu();
 
     // Auth elements
@@ -398,6 +411,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     loadReports();
 
+                    loadAdminTotalFoundItems();
+                    loadAdminTotalLostItems();
+
                     break;
             }
         });
@@ -669,58 +685,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const foundForm = document.getElementById("found-item-form");
 
-if (foundForm) {
+    if (foundForm) {
 
-    foundForm.addEventListener("submit", async (e) => {
+        foundForm.addEventListener("submit", async (e) => {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        const user = JSON.parse(localStorage.getItem("user"));
+            const user = JSON.parse(localStorage.getItem("user"));
 
-        const imageInput = document.getElementById("foundItemImage");
+            const imageInput = document.getElementById("foundItemImage");
 
-        const formData = new FormData();
+            const formData = new FormData();
 
-        formData.append("item_name", document.getElementById("found-item-name").value);
-        formData.append("category", document.getElementById("found-category").value);
-        formData.append("date_found", document.getElementById("found-date").value);
-        formData.append("location_found", document.getElementById("found-location").value);
-        formData.append("description", document.getElementById("found-description").value);
-        formData.append("email", user.email);
+            formData.append("item_name", document.getElementById("found-item-name").value);
+            formData.append("category", document.getElementById("found-category").value);
+            formData.append("date_found", document.getElementById("found-date").value);
+            formData.append("location_found", document.getElementById("found-location").value);
+            formData.append("description", document.getElementById("found-description").value);
+            formData.append("email", user.email);
 
-        if (imageInput.files.length > 0) {
-            formData.append("image", imageInput.files[0]);
-        }
-
-        const response = await fetch(
-            "http://127.0.0.1:5000/found-item",
-            {
-                method: "POST",
-                body: formData
+            if (imageInput.files.length > 0) {
+                formData.append("image", imageInput.files[0]);
             }
-        );
 
-        const data = await response.json();
+            const response = await fetch(
+                "http://127.0.0.1:5000/found-item",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
 
-        alert(data.message);
+            const data = await response.json();
 
-        if (response.ok) {
+            alert(data.message);
 
-            foundForm.reset();
+            if (response.ok) {
 
-            foundImagePreview.style.display = "none";
+                foundForm.reset();
 
-            loadTotalFoundItems();
+                foundImagePreview.style.display = "none";
 
-            loadRecentActivities();
+                loadTotalFoundItems();
 
-            showDashboardPage(dashboardPage);
+                loadRecentActivities();
 
-        }
+                showDashboardPage(dashboardPage);
 
-    });
+            }
 
-}
+        });
+
+    }
 
 
     const quickLostForm = document.getElementById("quick-lost-form");
@@ -844,6 +860,26 @@ if (foundForm) {
         const data = await response.json();
 
         document.getElementById("total-lost-items").innerText = data.total;
+
+    }
+
+    async function loadAdminTotalFoundItems() {
+
+        const response = await fetch("http://127.0.0.1:5000/total-found-items");
+        const data = await response.json();
+
+        document.getElementById("admin-total-found-items").innerText =
+            data.total;
+
+    }
+
+    async function loadAdminTotalLostItems() {
+
+        const response = await fetch("http://127.0.0.1:5000/total-lost-items");
+        const data = await response.json();
+
+        document.getElementById("admin-total-lost-items").innerText =
+            data.total;
 
     }
 
