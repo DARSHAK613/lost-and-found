@@ -534,7 +534,7 @@ def found_item():
 
         "image": filename,
 
-        "status": "Found"
+        "status": "Pending"
 
     })
 
@@ -573,7 +573,7 @@ def lost_item():
 
         "image": filename,
 
-        "status": "Lost"
+        "status": "Pending"
 
     })
     add_activity(data.get("email"), "Reported Lost Item")
@@ -605,7 +605,7 @@ def quick_lost_item():
 
         "image": "",
 
-        "status": "Lost"
+        "status": "Pending"
 
     })
     add_activity(data.get("email"), "Reported Quick Lost Item")
@@ -637,7 +637,7 @@ def quick_found_item():
 
         "image": "",
 
-        "status": "Found"
+        "status": "Pending"
 
     })
     add_activity(data.get("email"), "Reported Quick Found Item")
@@ -858,6 +858,56 @@ def get_all_reports():
         reports.append(report)
 
     return jsonify(reports)
+
+
+@app.route("/admin/approve-report", methods=["POST"])
+def approve_report():
+
+    data = request.json
+
+    report_id = data.get("id")
+    report_type = data.get("type")
+
+    if report_type == "Lost":
+        lost_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Approved"}}
+        )
+
+    elif report_type == "Found":
+        found_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Approved"}}
+        )
+
+    return jsonify({
+        "message": "Report Approved"
+    })
+
+@app.route("/admin/reject-report", methods=["POST"])
+def reject_report():
+
+    data = request.json
+
+    report_id = data.get("id")
+    report_type = data.get("type")
+
+    if report_type == "Lost":
+        lost_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Rejected"}}
+        )
+
+    elif report_type == "Found":
+        found_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Rejected"}}
+        )
+
+    return jsonify({
+        "message": "Report Rejected"
+    })
+
 
 @app.route("/admin/admin-count", methods=["GET"])
 def admin_count():
