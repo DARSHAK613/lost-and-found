@@ -216,10 +216,12 @@
             <ul class="sidebar-menu">
 
                 <li class="sidebar-item">
+                    <div class="user-only">
                     <a href="#" class="sidebar-link active" data-page="dashboard">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
+                </div>
                 </li>
 
                 <li class="sidebar-item admin-item">
@@ -236,6 +238,7 @@
                     </a>
                 </li>
 
+                <div class="user-only">
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link" data-page="report-lost">
                         <i class="fas fa-plus-circle"></i>
@@ -248,6 +251,8 @@
                         <span>Report Found Item</span>
                     </a>
                 </li>
+                </div>
+
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link" data-page="search-items">
                         <i class="fas fa-search"></i>
@@ -333,6 +338,7 @@
 
                 </div>
 
+            <div class="user-only">
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <div class="form-section">
@@ -385,7 +391,9 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+            
+            <div class="user-only">
                 <div class="form-section">
                     <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
                     <div class="row" id="recent-lost-items-container">
@@ -393,14 +401,19 @@
                     </div>
                 </div>
             </div>
+                
+            </div>
 
             <!-- Report Lost Item Page -->
             <div id="report-lost-page" class="page-content hidden">
-                <h1 class="page-title"><i class="fas fa-plus-circle"></i> Report Lost Item</h1>
+                <h1 class="page-title">
+                    <i class="fas fa-plus-circle">
+
+                    </i> Report Lost Item</h1>
                 <div class="form-section">
                     <form id="lost-item-form">
-                        <div class="row">
 
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Item Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone" required
@@ -445,6 +458,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="d-grid d-md-flex justify-content-md-end gap-3">
                             <button type="button" class="btn btn-outline-secondary"
                                 id="cancel-lost-report">Cancel</button>
@@ -1027,40 +1041,46 @@
                     Report Management
                 </h1>
                 <div class="stats-container">
-
                     <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-file-alt"></i>
+
+                        <div class="stat-icon found">
+                            <i class="fas fa-box-open"></i>
                         </div>
-                        <div class="stat-title">TOTAL REPORTS</div>
-                        <div class="stat-value" id="total-reports">0</div>
+                        <div class="stat-title">TOTAL ITEM FOUND</div>
+                        <div class="stat-value" id="admin-total-found-items">0</div>
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-icon danger">
-                            <i class="fas fa-search-minus"></i>
+                        <div class="stat-icon lost">
+                            <i class="fas fa-search"></i>
                         </div>
-                        <div class="stat-title">LOST REPORTS</div>
-                        <div class="stat-value" id="total-lost-reports">0</div>
+                        <div class="stat-title">TOTAL ITEM LOSS</div>
+                        <div class="stat-value" id="admin-total-lost-items">0</div>
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-search-plus"></i>
+                        <div class="stat-icon returned">
+                            <i class="fas fa-handshake"></i>
                         </div>
-                        <div class="stat-title">FOUND REPORTS</div>
-                        <div class="stat-value" id="total-found-reports">0</div>
+                        <div class="stat-title">TOTAL ITEM RETURNED</div>
+                        <div class="stat-value" id="admin-total-returned-items">0</div>
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-hourglass-half"></i>
+                        <div class="stat-icon unclaimed">
+                            <i class="fas fa-boxes-stacked"></i>
                         </div>
-                        <div class="stat-title">PENDING</div>
-                        <div class="stat-value" id="pending-reports">0</div>
+                        <div class="stat-title">UNCLAIMED ITEMS</div>
+                        <div class="stat-value" id="admin-unclaimed-items">0</div>
                     </div>
 
                 </div>
+
+
+
+
+                
+                
                 <div class="admin-table-container">
 
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -1321,90 +1341,89 @@
 
     </div>
 
-<!----view report model-->
+    <!----view report model-->
     <div class="modal fade" id="viewReportModal" tabindex="-1">
 
-    <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg">
 
-        <div class="modal-content">
+            <div class="modal-content">
 
-            <div class="modal-header">
+                <div class="modal-header">
 
-                <h5 class="modal-title">
-                    Report Details
-                </h5>
+                    <h5 class="modal-title">
+                        Report Details
+                    </h5>
 
-                <button class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        <p><strong>Item Name:</strong> <span id="report-item-name"></span></p>
-
-                        <p><strong>Category:</strong> <span id="report-category"></span></p>
-
-                        <p><strong>Type:</strong> <span id="report-type"></span></p>
-
-                        <p><strong>Status:</strong> <span id="report-status"></span></p>
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <p><strong>Reporter:</strong> <span id="report-user"></span></p>
-
-                        <p><strong>Student ID:</strong> <span id="report-studentid"></span></p>
-
-                        <p><strong>Department:</strong> <span id="report-department"></span></p>
-
-                        <p><strong>Phone:</strong> <span id="report-phone"></span></p>
-
-                    </div>
+                    <button class="btn-close" data-bs-dismiss="modal">
+                    </button>
 
                 </div>
 
-                <hr>
+                <div class="modal-body">
 
-                <p>
+                    <div class="row">
 
-                    <strong>Location:</strong>
+                        <div class="col-md-6">
 
-                    <span id="report-location"></span>
+                            <p><strong>Item Name:</strong> <span id="report-item-name"></span></p>
 
-                </p>
+                            <p><strong>Category:</strong> <span id="report-category"></span></p>
 
-                <p>
+                            <p><strong>Type:</strong> <span id="report-type"></span></p>
 
-                    <strong>Date:</strong>
+                            <p><strong>Status:</strong> <span id="report-status"></span></p>
 
-                    <span id="report-date"></span>
+                        </div>
 
-                </p>
+                        <div class="col-md-6">
 
-                <p>
+                            <p><strong>Reporter:</strong> <span id="report-user"></span></p>
 
-                    <strong>Description:</strong>
+                            <p><strong>Student ID:</strong> <span id="report-studentid"></span></p>
 
-                </p>
+                            <p><strong>Department:</strong> <span id="report-department"></span></p>
 
-                <div class="border rounded p-3">
+                            <p><strong>Phone:</strong> <span id="report-phone"></span></p>
 
-                    <span id="report-description"></span>
+                        </div>
 
-                </div>
+                    </div>
 
-                <div class="text-center mt-4">
+                    <hr>
 
-                    <img id="report-image"
-                        class="img-fluid rounded shadow"
-                        style="max-height:300px; display:none;">
+                    <p>
+
+                        <strong>Location:</strong>
+
+                        <span id="report-location"></span>
+
+                    </p>
+
+                    <p>
+
+                        <strong>Date:</strong>
+
+                        <span id="report-date"></span>
+
+                    </p>
+
+                    <p>
+
+                        <strong>Description:</strong>
+
+                    </p>
+
+                    <div class="border rounded p-3">
+
+                        <span id="report-description"></span>
+
+                    </div>
+
+                    <div class="text-center mt-4">
+
+                        <img id="report-image" class="img-fluid rounded shadow" style="max-height:300px; display:none;">
+
+                    </div>
 
                 </div>
 
@@ -1414,138 +1433,125 @@
 
     </div>
 
-</div>
 
 
 
-
-<!----- report model---->
+    <!----- report model---->
     <div class="modal fade" id="viewReportModal" tabindex="-1">
 
-    <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg">
 
-        <div class="modal-content">
+            <div class="modal-content">
 
-            <div class="modal-header">
+                <div class="modal-header">
 
-                <h5 class="modal-title">
-                    <i class="fas fa-file-alt"></i>
-                    Report Details
-                </h5>
+                    <h5 class="modal-title">
+                        <i class="fas fa-file-alt"></i>
+                        Report Details
+                    </h5>
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal">
-                </button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div class="text-center mb-4">
-
-                    <img
-                        id="report-image"
-                        src=""
-                        class="img-fluid rounded shadow"
-                        style="max-height:250px;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
 
                 </div>
 
-                <table class="table table-bordered">
+                <div class="modal-body">
 
-                    <tr>
-                        <th>Item Name</th>
-                        <td id="report-item-name"></td>
-                    </tr>
+                    <div class="text-center mb-4">
 
-                    <tr>
-                        <th>Category</th>
-                        <td id="report-category"></td>
-                    </tr>
+                        <img id="report-image" src="" class="img-fluid rounded shadow" style="max-height:250px;">
 
-                    <tr>
-                        <th>Type</th>
-                        <td id="report-type"></td>
-                    </tr>
+                    </div>
 
-                    <tr>
-                        <th>Reporter</th>
-                        <td id="report-reporter"></td>
-                    </tr>
+                    <table class="table table-bordered">
 
-                    <tr>
-                        <th>Student ID</th>
-                        <td id="report-studentid"></td>
-                    </tr>
+                        <tr>
+                            <th>Item Name</th>
+                            <td id="report-item-name"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Department</th>
-                        <td id="report-department"></td>
-                    </tr>
+                        <tr>
+                            <th>Category</th>
+                            <td id="report-category"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Email</th>
-                        <td id="report-email"></td>
-                    </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td id="report-type"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Phone</th>
-                        <td id="report-phone"></td>
-                    </tr>
+                        <tr>
+                            <th>Reporter</th>
+                            <td id="report-reporter"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Location</th>
-                        <td id="report-location"></td>
-                    </tr>
+                        <tr>
+                            <th>Student ID</th>
+                            <td id="report-studentid"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Description</th>
-                        <td id="report-description"></td>
-                    </tr>
+                        <tr>
+                            <th>Department</th>
+                            <td id="report-department"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Date</th>
-                        <td id="report-date"></td>
-                    </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td id="report-email"></td>
+                        </tr>
 
-                    <tr>
-                        <th>Status</th>
-                        <td id="report-status"></td>
-                    </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td id="report-phone"></td>
+                        </tr>
 
-                </table>
+                        <tr>
+                            <th>Location</th>
+                            <td id="report-location"></td>
+                        </tr>
 
-            </div>
+                        <tr>
+                            <th>Description</th>
+                            <td id="report-description"></td>
+                        </tr>
 
-            <div class="modal-footer">
+                        <tr>
+                            <th>Date</th>
+                            <td id="report-date"></td>
+                        </tr>
 
-                <button
-                    class="btn btn-success"
-                    id="approve-report-btn">
+                        <tr>
+                            <th>Status</th>
+                            <td id="report-status"></td>
+                        </tr>
 
-                    <i class="fas fa-check"></i>
-                    Approve
+                    </table>
 
-                </button>
+                </div>
 
-                <button
-                    class="btn btn-danger"
-                    id="reject-report-btn">
+                <div class="modal-footer">
 
-                    <i class="fas fa-times"></i>
-                    Reject
+                    <button class="btn btn-success" id="approve-report-btn">
 
-                </button>
+                        <i class="fas fa-check"></i>
+                        Approve
+
+                    </button>
+
+                    <button class="btn btn-danger" id="reject-report-btn">
+
+                        <i class="fas fa-times"></i>
+                        Reject
+
+                    </button>
+
+                </div>
 
             </div>
 
         </div>
 
     </div>
-
-</div>
 
 
 </body>
