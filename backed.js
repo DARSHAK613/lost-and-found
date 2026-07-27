@@ -1032,42 +1032,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const row = `
 
-        <tr>
+<tr>
 
-            <td>${report.item_name}</td>
+    <td>${report.fullname || "Unknown User"}</td>
 
-            <td>${badge}</td>
+    <td>${badge}</td>
 
-            <td>${report.fullname || "Unknown User"}</td>
+    <td>${report.item_name}</td>
 
-            <td>${report.date_lost || report.date_found || "-"}</td>
+    <td>${report.category || "-"}</td>
 
-            <td>
+    <td>
 
-                <span class="status-badge status-active">
-                    ${report.status}
-                </span>
+       <span class="status-badge
+        ${report.status === "Approved"
+                    ? "status-active"
+                    : report.status === "Pending"
+                        ? "status-pending"
+                        : report.status === "Rejected"
+                            ? "status-rejected"
+                            : "status-returned"
+                }">
 
-            </td>
+        ${report.status}
 
-            <td>
-                <button class="btn btn-sm btn-outline-primary view-report-btn">
-                    <i class="fas fa-eye"></i>
-                </button>
+    </span>
 
-                <button class="btn btn-sm btn-outline-success">
-                    <i class="fas fa-check"></i>
-                </button>
+    </td>
 
-                <button class="btn btn-sm btn-outline-danger">
-                    <i class="fas fa-times"></i>
-                </button>
+    <td>${report.date_lost || report.date_found || "-"}</td>
 
-            </td>
+    <td>
 
-        </tr>
+        <button class="btn btn-sm btn-outline-primary view-report-btn">
+            <i class="fas fa-eye"></i>
+        </button>
 
-    `;
+        <button class="btn btn-sm btn-outline-success">
+            <i class="fas fa-check"></i>
+        </button>
+
+        <button class="btn btn-sm btn-outline-danger">
+            <i class="fas fa-times"></i>
+        </button>
+
+    </td>
+
+</tr>
+
+`;
 
             tbody.insertAdjacentHTML("beforeend", row);
             const lastRow = tbody.lastElementChild;
@@ -1076,6 +1089,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 .addEventListener("click", () => {
                     console.log(report);
                     viewReport(report);
+                });
+            lastRow.querySelector(".btn-outline-success")
+                .addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/approve-report",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+
+                });
+            lastRow.querySelector(".btn-outline-danger")
+                .addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/reject-report",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+
                 });
 
         });
