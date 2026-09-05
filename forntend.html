@@ -927,115 +927,10 @@
                         </table>
                     </div>
                 </div>
-                <!--
-                <div class="admin-table-container mt-4">
-                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                        <h2 class="h5 mb-0">Report Management</h2>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary active">All Reports</button>
-                            <button class="btn btn-outline-primary">Lost Items</button>
-                            <button class="btn btn-outline-primary">Found Items</button>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Report ID</th>
-                                    <th>Item Name</th>
-                                    <th>Type</th>
-                                    <th>Reported By</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#R98765</td>
-                                    <td>Brown Leather Wallet</td>
-                                    <td><span class="badge bg-danger">Lost</span></td>
-                                    <td>John Smith</td>
-                                    <td>May 15, 2023</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#R87654</td>
-                                    <td>Wireless Headphones</td>
-                                    <td><span class="badge bg-success">Found</span></td>
-                                    <td>Sarah Johnson</td>
-                                    <td>May 17, 2023</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#R76543</td>
-                                    <td>Student ID Card</td>
-                                    <td><span class="badge bg-success">Found</span></td>
-                                    <td>Michael Chen</td>
-                                    <td>May 18, 2023</td>
-                                    <td><span class="status-badge status-pending">Pending</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#R65432</td>
-                                    <td>MacBook Pro</td>
-                                    <td><span class="badge bg-danger">Lost</span></td>
-                                    <td>Alex Rodriguez</td>
-                                    <td>May 16, 2023</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#R54321</td>
-                                    <td>Textbook: Calculus III</td>
-                                    <td><span class="badge bg-success">Found</span></td>
-                                    <td>Jessica Williams</td>
-                                    <td>May 16, 2023</td>
-                                    <td><span class="status-badge status-active">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary"><i
-                                                class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-success"><i
-                                                class="fas fa-check"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger"><i
-                                                class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div> -->
+
             </div>
+
+
             <div id="report-management-page" class="page-content hidden">
 
                 <h1 class="page-title">
@@ -1115,18 +1010,8 @@
                                     <option value="all">All Status</option>
                                     <option value="pending">Pending</option>
                                     <option value="approved">Approved</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-2">
-                                <select id="report-department-filter" class="form-select">
-                                    <option value="all">Department</option>
-                                    <option value="CO">CO</option>
-                                    <option value="IT">IT</option>
-                                    <option value="CE">CE</option>
-                                    <option value="ME">ME</option>
-                                    <option value="EE">EE</option>
-                                    <option value="EXTC">EXTC</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="returned">Returned</option>
                                 </select>
                             </div>
 
