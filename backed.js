@@ -218,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function () {
             clickedLink.classList.add('active');
         }
         loadTotalFoundItems();
+        loadTotalLostItems();
+        loadTotalReturnedItems();
     }
 
 
@@ -530,6 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Dashboard Data
                 loadTotalFoundItems();
                 loadTotalLostItems();
+                loadTotalReturnedItems();
                 loadRecentLostItems();
                 loadRecentActivities();
 
@@ -552,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 loadTotalFoundItems();
                 loadTotalLostItems();
+                loadTotalReturnedItems();
                 loadRecentLostItems();
 
 
@@ -863,6 +867,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
+    async function loadTotalReturnedItems() {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/total-returned-items"
+        );
+
+        const data = await response.json();
+
+        document.getElementById("returned-items").innerText = data.total;
+
+    }
+
     async function loadAdminTotalFoundItems() {
 
         const response = await fetch("http://127.0.0.1:5000/total-found-items");
@@ -1064,19 +1080,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <td>
 
-        <button class="btn btn-sm btn-outline-primary view-report-btn">
-            <i class="fas fa-eye"></i>
-        </button>
+    <button class="btn btn-sm btn-outline-primary view-report-btn">
+        <i class="fas fa-eye"></i>
+    </button>
 
-        <button class="btn btn-sm btn-outline-success">
-            <i class="fas fa-check"></i>
-        </button>
+    ${report.status === "Pending"
+                    ? `
+            <button class="btn btn-sm btn-outline-success approve-btn">
+                <i class="fas fa-check"></i>
+            </button>
 
-        <button class="btn btn-sm btn-outline-danger">
-            <i class="fas fa-times"></i>
-        </button>
+            <button class="btn btn-sm btn-outline-danger reject-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        `
+                    : report.status === "Approved"
+                        ? `
+            <button class="btn btn-sm btn-outline-info return-btn">
+                <i class="fas fa-box-open"></i>
+            </button>
 
-    </td>
+            <button class="btn btn-sm btn-outline-danger reject-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        `
+                        : report.status === "Returned"
+                            ? `
+            <button class="btn btn-sm btn-outline-warning unreturn-btn">
+                <i class="fas fa-undo"></i>
+            </button>
+        `
+                            : report.status === "Rejected"
+                                ? `
+            <button class="btn btn-sm btn-outline-secondary unreject-btn">
+                <i class="fas fa-rotate-left"></i>
+            </button>
+        `
+                                : ""
+                }
+
+</td>
 
 </tr>
 
@@ -1090,8 +1133,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log(report);
                     viewReport(report);
                 });
-            lastRow.querySelector(".btn-outline-success")
-                .addEventListener("click", async () => {
+            const approveBtn = lastRow.querySelector(".approve-btn");
+
+            if (approveBtn) {
+
+                approveBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
                         "http://127.0.0.1:5000/admin/approve-report",
@@ -1114,8 +1160,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     loadReports();
 
                 });
-            lastRow.querySelector(".btn-outline-danger")
-                .addEventListener("click", async () => {
+
+            }
+            const rejectBtn = lastRow.querySelector(".reject-btn");
+
+            if (rejectBtn) {
+
+                rejectBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
                         "http://127.0.0.1:5000/admin/reject-report",
@@ -1138,6 +1189,131 @@ document.addEventListener('DOMContentLoaded', function () {
                     loadReports();
 
                 });
+
+
+            }
+
+
+
+            const returnBtn = lastRow.querySelector(".return-btn");
+
+            if (returnBtn) {
+
+                returnBtn.addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/return-report",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+                    loadTotalReturnedItems();
+
+                });
+
+            }
+
+
+
+            if (returnBtn) {
+
+                returnBtn.addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/return-report",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+
+                });
+
+            }
+            const unreturnBtn = lastRow.querySelector(".unreturn-btn");
+
+            if (unreturnBtn) {
+
+                unreturnBtn.addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/not-returned",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+                    loadTotalReturnedItems();
+
+                });
+
+            }
+            const unrejectBtn = lastRow.querySelector(".unreject-btn");
+
+            if (unrejectBtn) {
+
+                unrejectBtn.addEventListener("click", async () => {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/admin/unreject-report",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                id: report._id,
+                                type: report.type
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    alert(data.message);
+
+                    loadReports();
+
+                });
+
+            }
 
         });
 
