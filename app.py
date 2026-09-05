@@ -1,6 +1,9 @@
 import smtplib
-EMAIL_ADDRESS = "lostandfoundgpmweb@gmail.com"
-EMAIL_PASSWORD = "ogsi nqhd jgpk vyyw"
+import os
+from dotenv import load_dotenv
+load_dotenv()
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
@@ -12,7 +15,7 @@ from pymongo import MongoClient
 from bson.codec_options import CodecOptions
 from bson import ObjectId
 from werkzeug.utils import secure_filename
-import os
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 app = Flask(__name__)
@@ -192,7 +195,7 @@ def send_otp():
         "phone": data.get("phone"),
         "studentid": data.get("studentid"),
         "department": data.get("department"),
-        "password": data.get("password"),
+        "password": generate_password_hash(data.get("password")),
         "otp": otp,
         "created_at": datetime.now(timezone.utc)
     })
@@ -222,9 +225,16 @@ def verify_otp():
     if not pending_user:
         return jsonify({"message": "Registration session expired."}), 400
 
+# Check OTP expiry (5 minutes)
+    otp_age = datetime.now(timezone.utc) - pending_user["created_at"]
+
+    if otp_age > timedelta(minutes=5):
+        pending_users.delete_one({"email": email})
+        return jsonify({"message": "OTP expired. Please request a new OTP."}), 400
+
     if pending_user["otp"] != otp:
         return jsonify({"message": "Invalid OTP"}), 400
-
+    
     users.insert_one({
         "firstname": pending_user["firstname"],
         "lastname": pending_user["lastname"],
@@ -278,39 +288,7 @@ def resend_otp():
 
     return jsonify({"message": "Failed to send OTP"}), 500
 
-@app.route("/register", methods=["POST"])
-def register():
 
-    data = request.json
-
-    firstname = data.get("firstname")
-    lastname = data.get("lastname")
-    email = data.get("email").strip().lower()
-    phone = data.get("phone")
-    studentid = data.get("studentid")
-    department = data.get("department")
-    password = data.get("password")
-
-    if users.find_one({"email": email}):
-        return jsonify({"message": "Email already registered"}), 400
-
-    users.insert_one({
-        "firstname": firstname,
-        "lastname": lastname,
-        "fullname": firstname + " " + lastname,
-        "email": email,
-        "phone": phone,
-        "studentid": studentid,
-        "department": department,
-        "password": password,
-
-        "status": "active",
-    "blocked_reason": "",
-    "blocked_by": "",
-    "blocked_date": ""
-    })
-
-    return jsonify({"message": "Registration Successful"})
 
 
 
@@ -345,8 +323,26 @@ def login():
     if not user:
         return jsonify({"message": "Email not found"}), 404
 
-    if str(user.get("password")) != password:
+    stored_password = user.get("password", "")
+
+    try:
+        password_correct = check_password_hash(stored_password, password)
+    except ValueError:
+        password_correct = (stored_password == password)
+
+    if not password_correct:
         return jsonify({"message": "Incorrect password"}), 401
+
+    if user.get("status") == "blocked":
+        return jsonify({
+            "message": "Your account has been blocked. Please contact the administrator."
+        }), 403
+    
+    if password_correct and stored_password == password:
+        users.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"password": generate_password_hash(password)}}
+        )
 
     return jsonify({
         "message": "Login successful",
@@ -668,6 +664,18 @@ def total_lost_items():
         "total": total
     })
 
+@app.route("/total-returned-items", methods=["GET"])
+def total_returned_items():
+
+    total = (
+        found_items.count_documents({"status": "Returned"}) +
+        lost_items.count_documents({"status": "Returned"})
+    )
+
+    return jsonify({
+        "total": total
+    })
+
 
 
 
@@ -753,15 +761,22 @@ def block_user():
 
     user = users.find_one({"_id": ObjectId(user_id)})
 
-    if user:
+    if not user:
+        return jsonify({
+            "success": False,
+            "message": "User not found."
+        }), 404
 
-        send_account_status_email(
-        user["email"],
-        user["fullname"],
-        "blocked",
-        reason,
-        note
-    )
+    email_sent = send_account_status_email(
+    user["email"],
+    user["fullname"],
+    "blocked",
+    reason,
+    note
+)
+
+    print("Email Sent:", email_sent)
+    print("Email Sent:", email_sent)
 
     users.update_one(
         {"_id": ObjectId(user_id)},
@@ -906,6 +921,79 @@ def reject_report():
 
     return jsonify({
         "message": "Report Rejected"
+    })
+
+
+@app.route("/admin/return-report", methods=["POST"])
+def return_report():
+
+    data = request.json
+
+    report_id = data.get("id")
+    report_type = data.get("type")
+
+    if report_type == "Lost":
+        lost_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Returned"}}
+        )
+
+    elif report_type == "Found":
+        found_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Returned"}}
+        )
+
+    return jsonify({
+        "message": "Item marked as Returned"
+    })
+
+@app.route("/admin/not-returned", methods=["POST"])
+def not_returned():
+
+    data = request.json
+
+    report_id = data.get("id")
+    report_type = data.get("type")
+
+    if report_type == "Lost":
+        lost_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Approved"}}
+        )
+
+    elif report_type == "Found":
+        found_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Approved"}}
+        )
+
+    return jsonify({
+        "message": "Item marked as Not Returned"
+    })
+
+@app.route("/admin/unreject-report", methods=["POST"])
+def unreject_report():
+
+    data = request.json
+
+    report_id = data.get("id")
+    report_type = data.get("type")
+
+    if report_type == "Lost":
+        lost_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Pending"}}
+        )
+
+    elif report_type == "Found":
+        found_items.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"status": "Pending"}}
+        )
+
+    return jsonify({
+        "message": "Report restored to Pending"
     })
 
 
