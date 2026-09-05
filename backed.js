@@ -1032,14 +1032,39 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error(error);
         }
     }
+    let reportSearch = "";
+    let reportType = "all";
+    let reportStatus = "all";
     async function loadReports() {
         const response = await fetch("http://127.0.0.1:5000/admin/reports");
 
         const reports = await response.json();
+        const filteredReports = reports.filter(report => {
+
+            const searchText = reportSearch;
+            const reportName = String(report.item_name || "").toLowerCase();
+            const reporterName = String(report.fullname || "").toLowerCase();
+            const studentId = String(report.studentid || "").toLowerCase();
+
+            const matchesSearch =
+                reportName.includes(searchText) ||
+                reporterName.includes(searchText) ||
+                studentId.includes(searchText);
+
+            const matchesType =
+                reportType === "all" ||
+                report.type.toLowerCase() === reportType.toLowerCase();
+
+            const matchesStatus =
+                reportStatus === "all" ||
+                report.status.toLowerCase() === reportStatus.toLowerCase();
+
+            return matchesSearch && matchesType && matchesStatus;
+        });
         const tbody = document.getElementById("reports-table-body");
 
         tbody.innerHTML = "";
-        reports.forEach(report => {
+        filteredReports.forEach(report => {
 
             const badge =
                 report.type === "Lost"
@@ -1048,17 +1073,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const row = `
 
-<tr>
+        <tr>
 
-    <td>${report.fullname || "Unknown User"}</td>
+        <td>${report.fullname || "Unknown User"}</td>
 
-    <td>${badge}</td>
+        <td>${badge}</td>
 
-    <td>${report.item_name}</td>
+        <td>${report.item_name}</td>
 
-    <td>${report.category || "-"}</td>
+        <td>${report.category || "-"}</td>
 
-    <td>
+        <td>
 
        <span class="status-badge
         ${report.status === "Approved"
@@ -1072,19 +1097,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ${report.status}
 
-    </span>
+        </span>
 
-    </td>
+        </td>
 
-    <td>${report.date_lost || report.date_found || "-"}</td>
+        <td>${report.date_lost || report.date_found || "-"}</td>
 
-    <td>
+        <td>
 
-    <button class="btn btn-sm btn-outline-primary view-report-btn">
+        <button class="btn btn-sm btn-outline-primary view-report-btn">
         <i class="fas fa-eye"></i>
-    </button>
+        </button>
 
-    ${report.status === "Pending"
+        ${report.status === "Pending"
                     ? `
             <button class="btn btn-sm btn-outline-success approve-btn">
                 <i class="fas fa-check"></i>
@@ -1093,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <button class="btn btn-sm btn-outline-danger reject-btn">
                 <i class="fas fa-times"></i>
             </button>
-        `
+            `
                     : report.status === "Approved"
                         ? `
             <button class="btn btn-sm btn-outline-info return-btn">
@@ -1103,27 +1128,27 @@ document.addEventListener('DOMContentLoaded', function () {
             <button class="btn btn-sm btn-outline-danger reject-btn">
                 <i class="fas fa-times"></i>
             </button>
-        `
+            `
                         : report.status === "Returned"
                             ? `
             <button class="btn btn-sm btn-outline-warning unreturn-btn">
                 <i class="fas fa-undo"></i>
             </button>
-        `
+            `
                             : report.status === "Rejected"
                                 ? `
             <button class="btn btn-sm btn-outline-secondary unreject-btn">
                 <i class="fas fa-rotate-left"></i>
             </button>
-        `
+            `
                                 : ""
                 }
 
-</td>
+            </td>
 
-</tr>
+            </tr>
 
-`;
+            `;
 
             tbody.insertAdjacentHTML("beforeend", row);
             const lastRow = tbody.lastElementChild;
@@ -1227,34 +1252,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
 
-
-            if (returnBtn) {
-
-                returnBtn.addEventListener("click", async () => {
-
-                    const response = await fetch(
-                        "http://127.0.0.1:5000/admin/return-report",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                id: report._id,
-                                type: report.type
-                            })
-                        }
-                    );
-
-                    const data = await response.json();
-
-                    alert(data.message);
-
-                    loadReports();
-
-                });
-
-            }
             const unreturnBtn = lastRow.querySelector(".unreturn-btn");
 
             if (unreturnBtn) {
@@ -1318,6 +1315,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+    document.getElementById("report-search").addEventListener("input", function () {
+        reportSearch = this.value.toLowerCase().trim();
+        loadReports();
+    });
+
+    document.getElementById("report-type-filter").addEventListener("change", function () {
+        reportType = this.value;
+        loadReports();
+    });
+
+    document.getElementById("report-status-filter").addEventListener("change", function () {
+        reportStatus = this.value;
+        loadReports();
+    });
     console.log("Reached viewReport");
     window.viewReport = function (report) {
         document.getElementById("report-item-name").innerText = report.item_name;
