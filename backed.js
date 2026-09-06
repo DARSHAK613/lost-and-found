@@ -1656,7 +1656,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td class="text-center">${user.studentid || "-"}</td>
             <td>${user.fullname}</td>
             <td>${user.email}</td>
-            <td>${user.role || "Student"}</td>
+            <td>${user.role === "admin" ? "Administrator" : "Student"}</td>
             <td>
 
     ${user.status === "blocked"
@@ -1686,9 +1686,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </button>
 
-                <button class="btn btn-sm btn-outline-warning">
-                    <i class="fas fa-edit"></i>
-                </button>
+                <button
+    class="btn btn-sm btn-outline-warning edit-user-btn"
+    data-id="${user._id}">
+    <i class="fas fa-edit"></i>
+</button>
 ${user.status === "blocked"
 
                     ?
@@ -1722,6 +1724,16 @@ ${user.status === "blocked"
             btn.addEventListener("click", () => {
 
                 viewUser(btn.dataset.id);
+
+            });
+
+        });
+
+        document.querySelectorAll(".edit-user-btn").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                openEditUser(btn.dataset.id);
 
             });
 
@@ -1839,6 +1851,110 @@ ${user.status === "blocked"
         modal.show();
 
     }
+    function openEditUser(id) {
+
+        const user = window.allUsers.find(u => u._id === id);
+
+        if (!user) return;
+
+        document.getElementById("edit-user-id").value =
+            user._id;
+
+        document.getElementById("edit-fullname").value =
+            user.fullname || "";
+
+        document.getElementById("edit-email").value =
+            user.email || "";
+
+        document.getElementById("edit-studentid").value =
+            user.studentid || "";
+
+        document.getElementById("edit-phone").value =
+            user.phone || "";
+
+        document.getElementById("edit-department").value =
+            user.department || "";
+
+        document.getElementById("edit-role").value =
+            user.role || "user";
+
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("editUserModal")
+        );
+
+        modal.show();
+
+    }
+    document.getElementById("save-edit-user-btn").addEventListener("click", async () => {
+
+        const userId =
+            document.getElementById("edit-user-id").value;
+
+        const fullname =
+            document.getElementById("edit-fullname").value.trim();
+
+        const studentid =
+            document.getElementById("edit-studentid").value.trim();
+
+        const phone =
+            document.getElementById("edit-phone").value.trim();
+
+        const department =
+            document.getElementById("edit-department").value.trim();
+        
+        const role =
+            document.getElementById("edit-role").value;
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:5000/admin/update-user",
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        user_id: userId,
+                        fullname: fullname,
+                        studentid: studentid,
+                        phone: phone,
+                        department: department,
+                        role: role
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            if (!response.ok) {
+                return;
+            }
+
+            const modalElement =
+                document.getElementById("editUserModal");
+
+            const modal =
+                bootstrap.Modal.getInstance(modalElement);
+
+            modal.hide();
+
+            loadUsers();
+
+        } catch (error) {
+
+            console.error("Update user error:", error);
+
+            alert("Something went wrong while updating the user.");
+
+        }
+
+    });
     function openBlockModal(id) {
 
         document.getElementById("block-user-id").value = id;
