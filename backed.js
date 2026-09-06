@@ -412,6 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     showDashboardPage(reportManagementPage);
 
                     loadReports();
+                    loadMatches();
 
                     loadAdminTotalFoundItems();
                     loadAdminTotalLostItems();
@@ -2047,6 +2048,70 @@ ${user.status === "blocked"
         alert(result.message);
 
         loadUsers();
+
+    }
+
+});
+async function loadMatches() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/admin/matches");
+
+        const matches = await response.json();
+
+        const tbody = document.getElementById("matches-table-body");
+
+        tbody.innerHTML = "";
+
+        if (matches.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No potential matches found.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        matches.forEach(match => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${match.lost_item}</td>
+
+                <td>${match.found_item}</td>
+
+                <td>${match.score}%</td>
+
+                <td>${match.level}</td>
+
+                <td>
+                    <button
+                        class="btn btn-sm btn-primary check-match-btn"
+                        data-lost-id="${match.lost_id}"
+                        data-found-id="${match.found_id}">
+                        Check Information
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading matches:", error);
+    }
+}
+document.addEventListener("click", function (e) {
+
+    if (e.target.classList.contains("check-match-btn")) {
+
+        const lostId = e.target.dataset.lostId;
+        const foundId = e.target.dataset.foundId;
+
+        console.log("Lost ID:", lostId);
+        console.log("Found ID:", foundId);
 
     }
 
