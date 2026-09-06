@@ -1903,7 +1903,7 @@ ${user.status === "blocked"
 
         const department =
             document.getElementById("edit-department").value.trim();
-        
+
         const role =
             document.getElementById("edit-role").value;
 
@@ -2103,15 +2103,136 @@ async function loadMatches() {
         console.error("Error loading matches:", error);
     }
 }
-document.addEventListener("click", function (e) {
+document.addEventListener("click", async function (e) {
 
     if (e.target.classList.contains("check-match-btn")) {
 
         const lostId = e.target.dataset.lostId;
         const foundId = e.target.dataset.foundId;
 
-        console.log("Lost ID:", lostId);
-        console.log("Found ID:", foundId);
+        try {
+
+            const response = await fetch(
+                `http://127.0.0.1:5000/admin/match/${lostId}/${foundId}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Server error:", data);
+                alert(data.message || "Unable to load match information.");
+                return;
+            }
+
+            const lost = data.lost_item;
+            const found = data.found_item;
+
+            const lostReporter = data.lost_reporter;
+            const foundReporter = data.found_reporter;
+
+
+            // Lost Item
+            document.getElementById("match-lost-item").textContent =
+                lost.item_name || "";
+
+            document.getElementById("match-lost-category").textContent =
+                lost.category || "";
+
+            document.getElementById("match-lost-date").textContent =
+                lost.date_lost || "";
+
+            document.getElementById("match-lost-location").textContent =
+                lost.location_lost || "";
+
+            document.getElementById("match-lost-description").textContent =
+                lost.description || "No description available.";
+            // Lost Item Image
+            const lostImage = document.getElementById("match-lost-image");
+
+            if (lost.image) {
+                lostImage.src = "http://127.0.0.1:5000/uploads/" + lost.image;
+                lostImage.style.display = "inline-block";
+            } else {
+                lostImage.style.display = "none";
+            }
+
+
+            // Lost Reporter
+            document.getElementById("match-lost-reporter-name").textContent =
+                lostReporter.fullname || "";
+
+            document.getElementById("match-lost-reporter-studentid").textContent =
+                lostReporter.studentid || "";
+
+            document.getElementById("match-lost-reporter-department").textContent =
+                lostReporter.department || "";
+
+            document.getElementById("match-lost-reporter-phone").textContent =
+                lostReporter.phone || "";
+
+            document.getElementById("match-lost-reporter-email").textContent =
+                lostReporter.email || "";
+
+
+            // Found Item
+            document.getElementById("match-found-item").textContent =
+                found.item_name || "";
+
+            document.getElementById("match-found-category").textContent =
+                found.category || "";
+
+            document.getElementById("match-found-date").textContent =
+                found.date_found || "";
+
+            document.getElementById("match-found-location").textContent =
+                found.location_found || "";
+
+            document.getElementById("match-found-description").textContent =
+                found.description || "No description available.";
+            // Found Item Image
+            const foundImage = document.getElementById("match-found-image");
+
+            if (found.image) {
+                foundImage.src = "http://127.0.0.1:5000/uploads/" + found.image;
+                foundImage.style.display = "inline-block";
+            } else {
+                foundImage.style.display = "none";
+            }
+
+
+            // Found Reporter
+            document.getElementById("match-found-reporter-name").textContent =
+                foundReporter.fullname || "";
+
+            document.getElementById("match-found-reporter-studentid").textContent =
+                foundReporter.studentid || "";
+
+            document.getElementById("match-found-reporter-department").textContent =
+                foundReporter.department || "";
+
+            document.getElementById("match-found-reporter-phone").textContent =
+                foundReporter.phone || "";
+
+            document.getElementById("match-found-reporter-email").textContent =
+                foundReporter.email || "";
+
+
+            // Open modal
+            const modalElement =
+                document.getElementById("matchInformationModal");
+
+            const modal =
+                new bootstrap.Modal(modalElement);
+
+            modal.show();
+
+        } catch (error) {
+
+            console.error("Error fetching match details:", error);
+
+            alert("Unable to load match information.");
+
+        }
 
     }
 
