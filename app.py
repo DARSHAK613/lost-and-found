@@ -1138,6 +1138,87 @@ def get_matches():
 
     return jsonify(matches)
 
+@app.route("/admin/match/<lost_id>/<found_id>", methods=["GET"])
+def get_match_details(lost_id, found_id):
+
+    # Validate Lost ID
+    try:
+        lost_object_id = ObjectId(lost_id)
+    except Exception:
+        return jsonify({
+            "message": "Invalid Lost report ID."
+        }), 400
+
+    # Validate Found ID
+    try:
+        found_object_id = ObjectId(found_id)
+    except Exception:
+        return jsonify({
+            "message": "Invalid Found report ID."
+        }), 400
+
+    # Find Lost report
+    lost_item = lost_items.find_one({
+        "_id": lost_object_id
+    })
+
+    if not lost_item:
+        return jsonify({
+            "message": "Lost report not found."
+        }), 404
+
+    # Find Found report
+    found_item = found_items.find_one({
+        "_id": found_object_id
+    })
+
+    if not found_item:
+        return jsonify({
+            "message": "Found report not found."
+        }), 404
+
+    # Find Lost reporter
+    lost_user = users.find_one({
+        "email": lost_item.get("email")
+    })
+
+    # Find Found reporter
+    found_user = users.find_one({
+        "email": found_item.get("email")
+    })
+
+    # Reporter information
+    lost_reporter = {}
+    if lost_user:
+        lost_reporter = {
+            "fullname": f'{lost_user.get("firstname", "")} {lost_user.get("lastname", "")}'.strip(),
+            "studentid": lost_user.get("studentid", ""),
+            "department": lost_user.get("department", ""),
+            "phone": lost_user.get("phone", ""),
+            "email": lost_user.get("email", "")
+        }
+
+    found_reporter = {}
+    if found_user:
+        found_reporter = {
+            "fullname": f'{found_user.get("firstname", "")} {found_user.get("lastname", "")}'.strip(),
+            "studentid": found_user.get("studentid", ""),
+            "department": found_user.get("department", ""),
+            "phone": found_user.get("phone", ""),
+            "email": found_user.get("email", "")
+        }
+
+    # Convert MongoDB IDs to strings
+    lost_item["_id"] = str(lost_item["_id"])
+    found_item["_id"] = str(found_item["_id"])
+
+    return jsonify({
+        "lost_item": lost_item,
+        "found_item": found_item,
+        "lost_reporter": lost_reporter,
+        "found_reporter": found_reporter
+    })
+
 @app.route("/admin/approve-report", methods=["POST"])
 def approve_report():
 
