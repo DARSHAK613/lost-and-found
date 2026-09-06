@@ -743,6 +743,7 @@ def get_all_users():
         admin["_id"] = str(admin["_id"])
         admin["studentid"] = "*"
         admin["department"] = "*"
+        admin["role"] = "admin"
 
     # Merge both
     all_users = student_users + admin_users
@@ -795,8 +796,171 @@ def block_user():
         "success": True,
         "message": "User blocked successfully."
     })
+@app.route("/admin/update-user", methods=["PUT"])
+def admin_update_user():
+
+    data = request.json
+
+    user_id = data.get("user_id")
+    fullname = data.get("fullname", "").strip()
+    studentid = data.get("studentid", "").strip()
+    phone = data.get("phone", "").strip()
+    department = data.get("department", "").strip()
+    role = data.get("role", "user")
+
+    if not user_id:
+        return jsonify({
+            "success": False,
+            "message": "User ID is required."
+        }), 400
+
+    if not fullname:
+        return jsonify({
+            "success": False,
+            "message": "Name cannot be empty."
+        }), 400
+
+    if role not in ["user", "admin"]:
+        return jsonify({
+            "success": False,
+            "message": "Invalid role."
+        }), 400
+
+    try:
+        object_id = ObjectId(user_id)
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Invalid user ID."
+        }), 400
+
+    # Find user in students collection
+    user = users.find_one({"_id": object_id})
+
+    # Find user in admins collection if not found in students
+    admin = admins.find_one({"_id": object_id})
+
+    if not user and not admin:
+        return jsonify({
+            "success": False,
+            "message": "User not found."
+        }), 404
+
+    current_role = "user" if user else "admin"
+
+    # Split full name
+    name_parts = fullname.split(" ", 1)
+
+    firstname = name_parts[0]
+    lastname = name_parts[1] if len(name_parts) > 1 else ""
+
+    # --------------------------------
+    # STUDENT → STUDENT
+    # --------------------------------
+
+    if current_role == "user" and role == "user":
+
+        users.update_one(
+            {"_id": object_id},
+            {
+                "$set": {
+                    "firstname": firstname,
+                    "lastname": lastname,
+                    "fullname": fullname,
+                    "studentid": studentid,
+                    "phone": phone,
+                    "department": department
+                }
+            }
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "User updated successfully."
+        })
 
 
+    # --------------------------------
+    # STUDENT → ADMINISTRATOR
+    # --------------------------------
+
+    if current_role == "user" and role == "admin":
+
+        new_admin = {
+            "fullname": fullname,
+            "email": user["email"],
+            "password": user["password"],
+            "phone": phone,
+            "status": user.get("status", "active")
+        }
+
+        admins.insert_one(new_admin)
+
+        users.delete_one({
+            "_id": object_id
+        })
+
+        return jsonify({
+            "success": True,
+            "message": "User role changed to Administrator successfully."
+        })
+
+
+    # --------------------------------
+    # ADMINISTRATOR → ADMINISTRATOR
+    # --------------------------------
+
+    if current_role == "admin" and role == "admin":
+
+        admins.update_one(
+            {"_id": object_id},
+            {
+                "$set": {
+                    "fullname": fullname,
+                    "phone": phone
+                }
+            }
+        )
+
+        return jsonify({
+            "success": True,
+            "message": "Administrator updated successfully."
+        })
+
+
+    # --------------------------------
+    # ADMINISTRATOR → STUDENT
+    # --------------------------------
+
+    if current_role == "admin" and role == "user":
+
+        new_user = {
+            "firstname": firstname,
+            "lastname": lastname,
+            "fullname": fullname,
+            "email": admin["email"],
+            "phone": phone,
+            "studentid": studentid,
+            "department": department,
+            "password": admin["password"],
+            "status": admin.get("status", "active")
+        }
+
+        users.insert_one(new_user)
+
+        admins.delete_one({
+            "_id": object_id
+        })
+
+        return jsonify({
+            "success": True,
+            "message": "Administrator role changed to Student successfully."
+        })
+
+    return jsonify({
+        "success": False,
+        "message": "Unable to update role."
+    }), 400
 @app.route("/admin/unblock-user", methods=["POST"])
 def unblock_user():
 
