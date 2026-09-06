@@ -9,6 +9,63 @@ from email.mime.multipart import MIMEMultipart
 import random
 from datetime import timedelta
 from flask import Flask, request, jsonify, send_from_directory
+from difflib import SequenceMatcher
+import re
+def normalize_text(text):
+    if not text:
+        return ""
+
+    text = str(text).lower().strip()
+    text = re.sub(r"\s+", " ", text)
+
+    return text
+
+def text_similarity(text1, text2):
+    text1 = normalize_text(text1)
+    text2 = normalize_text(text2)
+
+    if not text1 or not text2:
+        return 0
+
+    return SequenceMatcher(None, text1, text2).ratio()
+
+def calculate_match_score(lost_item, found_item):
+    name_score = text_similarity(
+        lost_item.get("item_name"),
+        found_item.get("item_name")
+    )
+
+    category_score = text_similarity(
+        lost_item.get("category"),
+        found_item.get("category")
+    )
+
+    description_score = text_similarity(
+        lost_item.get("description"),
+        found_item.get("description")
+    )
+
+    location_score = text_similarity(
+        lost_item.get("location_lost"),
+        found_item.get("location_found")
+    )
+
+    score = (
+        name_score * 40 +
+        category_score * 25 +
+        description_score * 25 +
+        location_score * 10
+    )
+
+    return round(score , 2)
+
+def get_match_level(score):
+    if score >= 80:
+        return "Strong Match"
+    elif score >= 60:
+        return "Possible Match"
+    else:
+        return "Probably Not Match"
 
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -684,7 +741,7 @@ def recent_lost_items():
 
     items = []
 
-    for item in lost_items.find().sort("_id", -1):
+    for item in lost_items.find({"status": "Approved"}).sort("_id", -1):
 
         items.append({
 
@@ -1038,6 +1095,48 @@ def get_all_reports():
 
     return jsonify(reports)
 
+@app.route("/admin/matches", methods=["GET"])
+def get_matches():
+    matches = []
+
+    approved_lost_items = list(
+        lost_items.find({"status": "Approved"})
+    )
+
+    approved_found_items = list(
+        found_items.find({"status": "Approved"})
+    )
+
+    for lost_item in approved_lost_items:
+        for found_item in approved_found_items:
+
+            score = calculate_match_score(
+                lost_item,
+                found_item
+            )
+
+            if score >= 60:
+                matches.append({
+                    "lost_id": str(lost_item["_id"]),
+                    "found_id": str(found_item["_id"]),
+                    "score": score,
+                    "level": get_match_level(score),
+                    "lost_item": lost_item.get("item_name", ""),
+                    "found_item": found_item.get("item_name", ""),
+                    "lost_category": lost_item.get("category", ""),
+                    "found_category": found_item.get("category", ""),
+                    "lost_description": lost_item.get("description", ""),
+                    "found_description": found_item.get("description", ""),
+                    "lost_location": lost_item.get("location_lost", ""),
+                    "found_location": found_item.get("location_found", "")
+                })
+
+    matches.sort(
+        key=lambda match: match["score"],
+        reverse=True
+    )
+
+    return jsonify(matches)
 
 @app.route("/admin/approve-report", methods=["POST"])
 def approve_report():
