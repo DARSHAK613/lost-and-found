@@ -2341,14 +2341,22 @@ async function loadMatchHistory() {
                 <td>${date}</td>
 
                 <td>
-                    <button
-                        class="btn btn-sm btn-danger not-match-btn"
-                        data-history-id="${match.history_id}"
-                        data-lost-id="${match.lost_id}"
-                        data-found-id="${match.found_id}">
-                        Not Match
-                    </button>
-                </td>
+    <button
+        class="btn btn-sm btn-success item-returned-btn"
+        data-history-id="${match.history_id}"
+        data-lost-id="${match.lost_id}"
+        data-found-id="${match.found_id}">
+        Item Returned
+    </button>
+
+    <button
+        class="btn btn-sm btn-danger not-match-btn"
+        data-history-id="${match.history_id}"
+        data-lost-id="${match.lost_id}"
+        data-found-id="${match.found_id}">
+        Not Match
+    </button>
+</td>
             `;
 
             tbody.appendChild(row);
@@ -2401,6 +2409,42 @@ document.addEventListener("click", async function (e) {
         loadMatches();
         loadMatchHistory();
 
+    }
+
+});
+document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("item-returned-btn")) {
+        return;
+    }
+
+    const historyId = e.target.dataset.historyId;
+    const lostId = e.target.dataset.lostId;
+    const foundId = e.target.dataset.foundId;
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/admin/item-returned",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                history_id: historyId,
+                lost_id: lostId,
+                found_id: foundId
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    if (response.ok) {
+        loadMatchHistory();
     }
 
 });
