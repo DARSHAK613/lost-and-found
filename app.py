@@ -97,6 +97,7 @@ db = client["lost_found"].with_options(
 users = db["users"]
 found_items = db["found_items"]
 lost_items = db["lost_items"]
+match_history = db["match_history"]
 activity_logs = db["activity_logs"]
 pending_users = db["pending_users"]
 admins = db["admins"]
@@ -1065,6 +1066,10 @@ def get_all_reports():
     for report in lost_items.find():
 
         report["_id"] = str(report["_id"])
+
+        if report.get("matched_with"):
+            report["matched_with"] = str(report["matched_with"])
+
         report["type"] = "Lost"
 
         user = users.find_one({"email": report.get("email")})
@@ -1081,6 +1086,9 @@ def get_all_reports():
     for report in found_items.find():
 
         report["_id"] = str(report["_id"])
+
+        if report.get("matched_with"):
+            report["matched_with"] = str(report["matched_with"])
         report["type"] = "Found"
 
         user = users.find_one({"email": report.get("email")})
@@ -1100,11 +1108,17 @@ def get_matches():
     matches = []
 
     approved_lost_items = list(
-        lost_items.find({"status": "Approved"})
+        lost_items.find({
+            "status": "Approved",
+            "matched": {"$ne": True}
+        })
     )
 
     approved_found_items = list(
-        found_items.find({"status": "Approved"})
+        found_items.find({
+            "status": "Approved",
+            "matched": {"$ne": True}
+        })
     )
 
     for lost_item in approved_lost_items:
@@ -1137,6 +1151,116 @@ def get_matches():
     )
 
     return jsonify(matches)
+
+@app.route("/admin/match-history", methods=["GET"])
+def get_match_history():
+
+    history = []
+
+    for match in match_history.find().sort("_id", -1):
+
+        lost_item = lost_items.find_one({
+            "_id": match["lost_id"]
+        })
+
+        found_item = found_items.find_one({
+            "_id": match["found_id"]
+        })
+
+        if not lost_item or not found_item:
+            continue
+
+        history.append({
+            "history_id": str(match["_id"]),
+
+            "lost_id": str(match["lost_id"]),
+            "found_id": str(match["found_id"]),
+
+            "lost_item": lost_item.get("item_name", ""),
+            "found_item": found_item.get("item_name", ""),
+
+            "status": match.get("status", "Confirmed"),
+
+            "created_at": match.get("created_at").isoformat()
+                if match.get("created_at") else ""
+        })
+
+    return jsonify(history)
+
+@app.route("/admin/not-match", methods=["POST"])
+def not_match():
+
+    data = request.json
+
+    lost_id = data.get("lost_id")
+    found_id = data.get("found_id")
+    history_id = data.get("history_id")
+
+    if not lost_id or not found_id or not history_id:
+        return jsonify({
+            "success": False,
+            "message": "Missing match information."
+        }), 400
+
+    try:
+        lost_object_id = ObjectId(lost_id)
+        found_object_id = ObjectId(found_id)
+        history_object_id = ObjectId(history_id)
+
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Invalid match ID."
+        }), 400
+
+    lost_item = lost_items.find_one({
+        "_id": lost_object_id
+    })
+
+    found_item = found_items.find_one({
+        "_id": found_object_id
+    })
+
+    if not lost_item or not found_item:
+        return jsonify({
+            "success": False,
+            "message": "Lost or found item not found."
+        }), 404
+
+    # Remove confirmed match from both reports
+    lost_items.update_one(
+        {"_id": lost_object_id},
+        {
+            "$set": {
+                "matched": False
+            },
+            "$unset": {
+                "matched_with": ""
+            }
+        }
+    )
+
+    found_items.update_one(
+        {"_id": found_object_id},
+        {
+            "$set": {
+                "matched": False
+            },
+            "$unset": {
+                "matched_with": ""
+            }
+        }
+    )
+
+    # Remove from matching history
+    match_history.delete_one({
+        "_id": history_object_id
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Match removed successfully."
+    })
 
 @app.route("/admin/match/<lost_id>/<found_id>", methods=["GET"])
 def get_match_details(lost_id, found_id):
@@ -1176,6 +1300,15 @@ def get_match_details(lost_id, found_id):
         return jsonify({
             "message": "Found report not found."
         }), 404
+
+    lost_item["_id"] = str(lost_item["_id"])
+    found_item["_id"] = str(found_item["_id"])
+
+    if "matched_with" in lost_item:
+        lost_item["matched_with"] = str(lost_item["matched_with"])
+
+    if "matched_with" in found_item:
+        found_item["matched_with"] = str(found_item["matched_with"])
 
     # Find Lost reporter
     lost_user = users.find_one({
@@ -1219,6 +1352,119 @@ def get_match_details(lost_id, found_id):
         "found_reporter": found_reporter
     })
 
+@app.route("/admin/confirm-match", methods=["POST"])
+def confirm_match():
+
+    data = request.json
+
+    lost_id = data.get("lost_id")
+    found_id = data.get("found_id")
+    match_history = db["match_history"]
+
+    # Check IDs are provided
+    if not lost_id or not found_id:
+        return jsonify({
+            "success": False,
+            "message": "Lost ID and Found ID are required."
+        }), 400
+
+    # Validate Lost ID
+    try:
+        lost_object_id = ObjectId(lost_id)
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Invalid Lost report ID."
+        }), 400
+
+    # Validate Found ID
+    try:
+        found_object_id = ObjectId(found_id)
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Invalid Found report ID."
+        }), 400
+
+    # Find Lost report
+    lost_item = lost_items.find_one({
+        "_id": lost_object_id
+    })
+
+    if not lost_item:
+        return jsonify({
+            "success": False,
+            "message": "Lost report not found."
+        }), 404
+
+    # Find Found report
+    found_item = found_items.find_one({
+        "_id": found_object_id
+    })
+
+    if not found_item:
+        return jsonify({
+            "success": False,
+            "message": "Found report not found."
+        }), 404
+
+    # Both reports must be Approved
+    if lost_item.get("status") != "Approved":
+        return jsonify({
+            "success": False,
+            "message": "Lost report must be Approved before confirming the match."
+        }), 400
+
+    if found_item.get("status") != "Approved":
+        return jsonify({
+            "success": False,
+            "message": "Found report must be Approved before confirming the match."
+        }), 400
+
+    # Prevent duplicate confirmation
+    if lost_item.get("matched") is True:
+        return jsonify({
+            "success": False,
+            "message": "This Lost report is already matched."
+        }), 400
+
+    if found_item.get("matched") is True:
+        return jsonify({
+            "success": False,
+            "message": "This Found report is already matched."
+        }), 400
+
+    # Store the Lost ↔ Found relationship
+    lost_items.update_one(
+        {"_id": lost_object_id},
+        {
+            "$set": {
+                "matched": True,
+                "matched_with": found_object_id
+            }
+        }
+    )
+
+    found_items.update_one(
+        {"_id": found_object_id},
+        {
+            "$set": {
+                "matched": True,
+                "matched_with": lost_object_id
+            }
+        }
+    )
+    match_history.insert_one({
+        "lost_id": lost_object_id,
+        "found_id": found_object_id,
+        "status": "Confirmed",
+        "created_at": datetime.now(timezone.utc)
+    })
+
+    return jsonify({
+        "success": True,
+        "message": "Match confirmed successfully."
+    })
 @app.route("/admin/approve-report", methods=["POST"])
 def approve_report():
 
