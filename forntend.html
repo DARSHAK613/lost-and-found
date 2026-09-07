@@ -237,6 +237,12 @@
                         <span>Report Management</span>
                     </a>
                 </li>
+                <li class="sidebar-item admin-item">
+                    <a href="#" class="sidebar-link" id="potential-matches-link" data-page="potential-matches">
+                        <i class="fas fa-link"></i>
+                        <span>Potential Matches</span>
+                    </a>
+                </li>
 
                 <div class="user-only">
                     <li class="sidebar-item">
@@ -1051,7 +1057,20 @@
                     </div>
 
                 </div>
-                <div class="admin-table-container mt-4">
+
+
+
+            </div>
+            <div id="potential-matches-page" class="page-content hidden">
+
+                <h1 class="page-title">
+
+                    <i class="fas fa-link"></i>
+                    Potential Matches
+
+                </h1>
+
+                <div class="admin-table-container">
 
                     <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
 
@@ -1088,9 +1107,47 @@
                         </table>
 
                     </div>
+                    <div class="admin-table-container mt-4">
+
+                        <div class="p-3 border-bottom">
+
+                            <h2 class="h5 mb-0">
+                                Matching History
+                            </h2>
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover mb-0">
+
+                                <thead>
+                                    <tr>
+
+                                        <th>Lost Item</th>
+
+                                        <th>Found Item</th>
+
+                                        <th>Status</th>
+
+                                        <th>Date</th>
+
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody id="match-history-table-body">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
 
                 </div>
-
 
             </div>
         </div>
@@ -1290,6 +1347,9 @@
                 </div>
 
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirmMatchBtn">
+                        Confirm Match
+                    </button>
 
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
