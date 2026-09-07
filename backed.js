@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const profilePage = document.getElementById('profile-page');
     const manageUsersPage = document.getElementById("manage-users-page");
     const reportManagementPage = document.getElementById("report-management-page");
+    const potentialMatchesPage = document.getElementById("potential-matches-page");
 
     // Sidebar elements
     const sidebar = document.getElementById('sidebar');
@@ -206,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
         profilePage.classList.add('hidden');
         manageUsersPage.classList.add('hidden');
         reportManagementPage.classList.add('hidden');
+        potentialMatchesPage.classList.add('hidden');
 
 
 
@@ -412,10 +414,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     showDashboardPage(reportManagementPage);
 
                     loadReports();
-                    loadMatches();
 
                     loadAdminTotalFoundItems();
                     loadAdminTotalLostItems();
+
+                    break;
+
+                case "potential-matches":
+
+                    showDashboardPage(potentialMatchesPage, link);
+
+                    loadMatches();
+                    loadMatchHistory();
 
                     break;
             }
@@ -2110,6 +2120,9 @@ document.addEventListener("click", async function (e) {
         const lostId = e.target.dataset.lostId;
         const foundId = e.target.dataset.foundId;
 
+        document.getElementById("confirmMatchBtn").dataset.lostId = lostId;
+        document.getElementById("confirmMatchBtn").dataset.foundId = foundId;
+
         try {
 
             const response = await fetch(
@@ -2233,6 +2246,160 @@ document.addEventListener("click", async function (e) {
             alert("Unable to load match information.");
 
         }
+
+    }
+
+    if (e.target.id === "confirmMatchBtn") {
+
+        const lostId = e.target.dataset.lostId;
+        const foundId = e.target.dataset.foundId;
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:5000/admin/confirm-match",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        lost_id: lostId,
+                        found_id: foundId
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Unable to confirm match.");
+                return;
+            }
+
+            alert(data.message);
+
+            loadMatches();
+
+            loadMatchHistory();
+
+        } catch (error) {
+
+            console.error("Error confirming match:", error);
+
+            alert("Unable to confirm match.");
+
+        }
+
+    }
+
+});
+async function loadMatchHistory() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/admin/match-history"
+        );
+
+        const history = await response.json();
+
+        const tbody = document.getElementById(
+            "match-history-table-body"
+        );
+
+        tbody.innerHTML = "";
+
+        if (history.length === 0) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No matching history found.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        history.forEach(match => {
+
+            const row = document.createElement("tr");
+
+            const date = match.created_at
+                ? new Date(match.created_at).toLocaleString()
+                : "";
+
+            row.innerHTML = `
+                <td>${match.lost_item}</td>
+
+                <td>${match.found_item}</td>
+
+                <td>${match.status}</td>
+
+                <td>${date}</td>
+
+                <td>
+                    <button
+                        class="btn btn-sm btn-danger not-match-btn"
+                        data-history-id="${match.history_id}"
+                        data-lost-id="${match.lost_id}"
+                        data-found-id="${match.found_id}">
+                        Not Match
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Error loading match history:",
+            error
+        );
+
+    }
+
+}
+document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("not-match-btn")) {
+        return;
+    }
+
+    const historyId = e.target.dataset.historyId;
+    const lostId = e.target.dataset.lostId;
+    const foundId = e.target.dataset.foundId;
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/admin/not-match",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                history_id: historyId,
+                lost_id: lostId,
+                found_id: foundId
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    if (response.ok) {
+
+        loadMatches();
+        loadMatchHistory();
 
     }
 
