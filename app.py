@@ -223,6 +223,34 @@ Lost & Found Team
         print("Email Error:", e)
         return False
 
+def send_match_notification_email(receiver_email, subject, body):
+
+    message = MIMEMultipart()
+    message["From"] = EMAIL_ADDRESS
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(body, "plain"))
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+        server.sendmail(
+            EMAIL_ADDRESS,
+            receiver_email,
+            message.as_string()
+        )
+
+        server.quit()
+
+        return True
+
+    except Exception as e:
+        print("Email Error:", e)
+        return False
+
 @app.route("/")
 def home():
     return "Server is running"
@@ -1262,6 +1290,83 @@ def not_match():
         "message": "Match removed successfully."
     })
 
+@app.route("/admin/item-returned", methods=["POST"])
+def item_returned():
+
+    data = request.json
+
+    lost_id = data.get("lost_id")
+    found_id = data.get("found_id")
+    history_id = data.get("history_id")
+
+    if not lost_id or not found_id or not history_id:
+        return jsonify({
+            "success": False,
+            "message": "Missing match information."
+        }), 400
+
+    try:
+        lost_object_id = ObjectId(lost_id)
+        found_object_id = ObjectId(found_id)
+        history_object_id = ObjectId(history_id)
+
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Invalid match ID."
+        }), 400
+
+    lost_item = lost_items.find_one({
+        "_id": lost_object_id
+    })
+
+    found_item = found_items.find_one({
+        "_id": found_object_id
+    })
+
+    if not lost_item or not found_item:
+        return jsonify({
+            "success": False,
+            "message": "Lost or found item not found."
+        }), 404
+
+    #.........................
+    # Update matching history
+    match_history.update_one(
+        {"_id": history_object_id},
+        {
+            "$set": {
+                "status": "Item Returned",
+                "received_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+
+# Email lost user
+    if lost_item.get("email"):
+
+        send_match_notification_email(
+            lost_item.get("email"),
+            "Your Lost Item Has Been Returned",
+            "Your item has been successfully returned. Thank you for using the Lost & Found Management System."
+        )
+
+# Email found user
+    if found_item.get("email"):
+
+       send_match_notification_email(
+            found_item.get("email"),
+            "Thank You for Your Help",
+            "Thank you for helping return the lost item to its owner. We appreciate your cooperation."
+        )
+    #.........................
+
+    return jsonify({
+        "success": True,
+        "message": "Item returned successfully."
+    })
+
+
 @app.route("/admin/match/<lost_id>/<found_id>", methods=["GET"])
 def get_match_details(lost_id, found_id):
 
@@ -1454,6 +1559,7 @@ def confirm_match():
             }
         }
     )
+    
     match_history.insert_one({
         "lost_id": lost_object_id,
         "found_id": found_object_id,
@@ -1461,10 +1567,29 @@ def confirm_match():
         "created_at": datetime.now(timezone.utc)
     })
 
+    # Email Lost User
+    if lost_item.get("email"):
+
+        send_match_notification_email(
+            lost_item.get("email"),
+            "Your Lost Item Has Been Found",
+            "Your item has been found. Please collect it from the administrator."
+            )
+
+# Email Found User
+    if found_item.get("email"):
+
+        send_match_notification_email(
+            found_item.get("email"),
+            "Thank You for Your Help",
+            "Thank you for your help. Your found item has been matched with its owner."
+        )
+
     return jsonify({
         "success": True,
         "message": "Match confirmed successfully."
     })
+
 @app.route("/admin/approve-report", methods=["POST"])
 def approve_report():
 
