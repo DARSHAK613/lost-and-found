@@ -1341,6 +1341,16 @@ def item_returned():
             }
         }
     )
+    # Update Lost and Found report status
+    lost_items.update_one(
+        {"_id": lost_object_id},
+        {"$set": {"status": "Returned"}}
+    )
+
+    found_items.update_one(
+        {"_id": found_object_id},
+        {"$set": {"status": "Returned"}}
+    )   
 
 # Email lost user
     if lost_item.get("email"):
@@ -1559,7 +1569,7 @@ def confirm_match():
             }
         }
     )
-    
+
     match_history.insert_one({
         "lost_id": lost_object_id,
         "found_id": found_object_id,
