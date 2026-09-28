@@ -400,6 +400,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'search-items':
                     showDashboardPage(searchItemsPage, link);
                     loadSearchItems();
+
+                    const role = localStorage.getItem("role");
+
+                    const statusFilterGroup =
+                        document.getElementById("status-filter-group");
+
+                    if (statusFilterGroup) {
+                        if (role === "admin") {
+                            statusFilterGroup.style.display = "";
+                        } else {
+                            statusFilterGroup.style.display = "none";
+                        }
+                    }
+
                     break;
                 case 'profile':
                     showDashboardPage(profilePage, link);
@@ -630,6 +644,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const role = localStorage.getItem("role");
 
+        const category =
+            document.getElementById("categoryFilter").value;
+
+        const status =
+            document.getElementById("statusFilter").value;
+
+        const dateRange =
+            document.getElementById("dateFilter").value;
+
         let url;
 
         if (role === "admin") {
@@ -643,20 +666,88 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch(url);
 
             if (!response.ok) {
-                throw new Error("Failed to load search items");
+                throw new Error(`HTTP error: ${response.status}`);
             }
 
             const results = await response.json();
 
-            searchItemsData = results;
-
             console.log("Search Items:", results);
 
-            displaySearchResults(results);
+            searchItemsData = results;
+
+            // Apply filters on the returned data
+            let filteredResults = results.filter(item => {
+
+                // Category filter
+                if (
+                    category !== "All Categories" &&
+                    item.category !== category
+                ) {
+                    return false;
+                }
+
+                // Status / type filter
+                if (
+                    status !== "All Statuses" &&
+                    item.type !== status
+                ) {
+                    return false;
+                }
+
+                // Date filter
+                if (dateRange !== "All time") {
+
+                    const itemDate =
+                        item.date ||
+                        item.date_lost ||
+                        item.date_found;
+
+                    if (!itemDate) {
+                        return false;
+                    }
+
+                    const itemDateObj =
+                        new Date(itemDate);
+
+                    const today = new Date();
+
+                    let days;
+
+                    if (dateRange === "Last 7 days") {
+                        days = 7;
+                    } else if (dateRange === "Last 30 days") {
+                        days = 30;
+                    } else if (dateRange === "Last 3 months") {
+                        days = 90;
+                    }
+
+                    const pastDate = new Date(today);
+
+                    pastDate.setDate(
+                        today.getDate() - days
+                    );
+
+                    if (itemDateObj < pastDate) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            console.log(
+                "Filtered Search Items:",
+                filteredResults
+            );
+
+            displaySearchResults(filteredResults);
 
         } catch (error) {
 
-            console.error("Search Items error:", error);
+            console.error(
+                "Search Items error:",
+                error
+            );
 
             const resultsContainer =
                 document.getElementById("searchResults");
@@ -754,21 +845,60 @@ document.addEventListener('DOMContentLoaded', function () {
     // Search button
     searchButton.addEventListener("click", () => {
 
-        const searchTerm = document
-            .getElementById("searchInput")
-            .value
-            .trim();
+        const searchTerm =
+            document.getElementById("searchInput").value.trim();
+
+        loadSearchItems(searchTerm);
+    });
+
+    document.getElementById("categoryFilter").addEventListener("change", () => {
+
+        const searchTerm =
+            document.getElementById("searchInput").value.trim();
 
         loadSearchItems(searchTerm);
     });
 
 
-    // Reset filters
+    document.getElementById("statusFilter").addEventListener("change", () => {
+
+        const searchTerm =
+            document.getElementById("searchInput").value.trim();
+
+        loadSearchItems(searchTerm);
+    });
+
+
+    document.getElementById("dateFilter").addEventListener("change", () => {
+
+        const searchTerm =
+            document.getElementById("searchInput").value.trim();
+
+        loadSearchItems(searchTerm);
+    });
+
+    // Press Enter to search
+    document.getElementById("searchInput").addEventListener("keydown", (event) => {
+
+        if (event.key === "Enter") {
+
+            const searchTerm =
+                document.getElementById("searchInput").value.trim();
+
+            loadSearchItems(searchTerm);
+        }
+    });
+
+
+    // Reset
     resetFilters.addEventListener("click", () => {
 
         document.getElementById("searchInput").value = "";
+
         document.getElementById("categoryFilter").selectedIndex = 0;
+
         document.getElementById("statusFilter").selectedIndex = 0;
+
         document.getElementById("dateFilter").selectedIndex = 0;
 
         loadSearchItems();
