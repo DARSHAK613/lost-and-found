@@ -702,6 +702,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         item.date_lost ||
                         item.date_found;
 
+                    console.log(
+                        "DATE CHECK:",
+                        item.item_name,
+                        "API date:",
+                        itemDate,
+                        "Date object:",
+                        new Date(itemDate),
+                        "Selected range:",
+                        dateRange
+                    );
+
                     if (!itemDate) {
                         return false;
                     }
@@ -711,21 +722,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const today = new Date();
 
-                    let days;
+                    let pastDate = new Date(today);
 
                     if (dateRange === "Last 7 days") {
-                        days = 7;
+
+                        pastDate.setDate(
+                            today.getDate() - 7
+                        );
+
                     } else if (dateRange === "Last 30 days") {
-                        days = 30;
+
+                        pastDate.setDate(
+                            today.getDate() - 30
+                        );
+
                     } else if (dateRange === "Last 3 months") {
-                        days = 90;
+
+                        pastDate.setMonth(
+                            today.getMonth() - 3
+                        );
                     }
-
-                    const pastDate = new Date(today);
-
-                    pastDate.setDate(
-                        today.getDate() - days
-                    );
 
                     if (itemDateObj < pastDate) {
                         return false;
@@ -1844,10 +1860,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                 loadUserProfile();
-
-                if (role === "user") {
-                    loadRecentActivities();
-                }
+                loadRecentActivities();
 
             }
 

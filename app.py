@@ -482,7 +482,11 @@ def update_profile():
             }
         )
 
+        add_activity(email, "Updated Profile")
+
         updated = admins.find_one({"email": email})
+
+
 
         return jsonify({
 
@@ -575,6 +579,8 @@ def change_password():
                 }
             }
         )
+
+        add_activity(email, "Changed Password")
 
         return jsonify({
             "message": "Admin password changed successfully"
