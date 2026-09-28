@@ -2,8 +2,8 @@ import smtplib
 import os
 from dotenv import load_dotenv
 load_dotenv()
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+EMAIL_ADDRESS = os.getenv("lostandfoundadmin001@gmail.com")
+EMAIL_PASSWORD = os.getenv("foiz wefz ruqm yvab")
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
@@ -225,31 +225,15 @@ Lost & Found Team
 
 def send_match_notification_email(receiver_email, subject, body):
 
-    message = MIMEMultipart()
-    message["From"] = EMAIL_ADDRESS
-    message["To"] = receiver_email
-    message["Subject"] = subject
-
-    message.attach(MIMEText(body, "plain"))
-
-    try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-
-        server.sendmail(
-            EMAIL_ADDRESS,
-            receiver_email,
-            message.as_string()
-        )
-
-        server.quit()
-
-        return True
-
-    except Exception as e:
-        print("Email Error:", e)
+    if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
+        print("Email configuration error: EMAIL_ADDRESS or EMAIL_PASSWORD is missing.")
         return False
+
+    if not receiver_email:
+        print("Email error: receiver email is missing.")
+        return False
+
+    message = MIMEMultipart()
 
 @app.route("/")
 def home():
@@ -790,6 +774,117 @@ def recent_lost_items():
 
     return jsonify(items)
 
+@app.route("/search-lost-items", methods=["GET"])
+def search_lost_items():
+
+    search_term = request.args.get("q", "").strip()
+
+    query = {
+        "status": {
+            "$regex": "^Approved$",
+            "$options": "i"
+        }
+    }
+
+    if search_term:
+
+        pattern = re.escape(search_term)
+
+        query["$or"] = [
+            {"item_name": {"$regex": pattern, "$options": "i"}},
+            {"category": {"$regex": pattern, "$options": "i"}},
+            {"location_lost": {"$regex": pattern, "$options": "i"}},
+            {"description": {"$regex": pattern, "$options": "i"}}
+        ]
+
+    items = []
+
+    for item in lost_items.find(query).sort("_id", -1).limit(50):
+
+        items.append({
+            "id": str(item["_id"]),
+            "item_name": item.get("item_name", ""),
+            "category": item.get("category", ""),
+            "date_lost": item.get("date_lost", ""),
+            "location_lost": item.get("location_lost", ""),
+            "description": item.get("description", ""),
+            "image": item.get("image", ""),
+            "status": item.get("status", "")
+        })
+
+    return jsonify(items)
+
+
+@app.route("/admin/search-items", methods=["GET"])
+def admin_search_items():
+
+    search_term = request.args.get("q", "").strip()
+
+    # Search both Lost and Found reports
+    lost_query = {
+        "status": {
+            "$regex": "^Approved$",
+            "$options": "i"
+        }
+    }
+
+    found_query = {
+        "status": {
+            "$regex": "^Approved$",
+            "$options": "i"
+        }
+    }
+
+    if search_term:
+
+        pattern = re.escape(search_term)
+
+        search_conditions = [
+            {"item_name": {"$regex": pattern, "$options": "i"}},
+            {"category": {"$regex": pattern, "$options": "i"}},
+            {"description": {"$regex": pattern, "$options": "i"}}
+        ]
+
+        lost_query["$or"] = search_conditions
+        found_query["$or"] = search_conditions
+
+    results = []
+
+    # -------------------------
+    # Lost Items
+    # -------------------------
+    for item in lost_items.find(lost_query).sort("_id", -1).limit(50):
+
+        results.append({
+            "id": str(item["_id"]),
+            "type": "Lost",
+            "item_name": item.get("item_name", ""),
+            "category": item.get("category", ""),
+            "date": item.get("date_lost", ""),
+            "location": item.get("location_lost", ""),
+            "description": item.get("description", ""),
+            "image": item.get("image", ""),
+            "status": item.get("status", "")
+        })
+
+    # -------------------------
+    # Found Items
+    # -------------------------
+    for item in found_items.find(found_query).sort("_id", -1).limit(50):
+
+        results.append({
+            "id": str(item["_id"]),
+            "type": "Found",
+            "item_name": item.get("item_name", ""),
+            "category": item.get("category", ""),
+            "date": item.get("date_found", ""),
+            "location": item.get("location_found", ""),
+            "description": item.get("description", ""),
+            "image": item.get("image", ""),
+            "status": item.get("status", "")
+        })
+
+    return jsonify(results)
 
 
 @app.route("/recent-activities")

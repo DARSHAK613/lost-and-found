@@ -399,6 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
                 case 'search-items':
                     showDashboardPage(searchItemsPage, link);
+                    loadSearchItems();
                     break;
                 case 'profile':
                     showDashboardPage(profilePage, link);
@@ -621,19 +622,156 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Search Functionality
-    searchButton.addEventListener('click', () => {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        if (searchTerm) {
-            alert(`Searching for: ${searchTerm}\nIn a real application, this would filter the results.`);
+    // Search Functionality
+
+    let searchItemsData = [];
+
+    async function loadSearchItems(searchTerm = "") {
+
+        const role = localStorage.getItem("role");
+
+        let url;
+
+        if (role === "admin") {
+            url = `http://127.0.0.1:5000/admin/search-items?q=${encodeURIComponent(searchTerm)}`;
+        } else {
+            url = `http://127.0.0.1:5000/search-lost-items?q=${encodeURIComponent(searchTerm)}`;
         }
+
+        try {
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Failed to load search items");
+            }
+
+            const results = await response.json();
+
+            searchItemsData = results;
+
+            console.log("Search Items:", results);
+
+            displaySearchResults(results);
+
+        } catch (error) {
+
+            console.error("Search Items error:", error);
+
+            const resultsContainer =
+                document.getElementById("searchResults");
+
+            resultsContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    Unable to load items.
+                </div>
+            </div>
+        `;
+        }
+    }
+
+
+    function displaySearchResults(results) {
+
+        const resultsContainer =
+            document.getElementById("searchResults");
+
+        resultsContainer.innerHTML = "";
+
+        if (results.length === 0) {
+
+            resultsContainer.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No items found.
+                </div>
+            </div>
+        `;
+
+            return;
+        }
+
+        results.forEach(item => {
+
+            const type = item.type || "Lost";
+
+            const typeClass =
+                type.toLowerCase() === "found"
+                    ? "category-found"
+                    : "category-lost";
+
+            const card = document.createElement("div");
+
+            card.className = "col-md-6 col-lg-4 mb-4";
+
+            card.innerHTML = `
+            <div class="item-card h-100">
+
+                <div class="item-details">
+
+                    <span class="item-category ${typeClass}">
+                        ${type.toUpperCase()}
+                    </span>
+
+                    <h3 class="item-title">
+                        ${item.item_name || "Unknown Item"}
+                    </h3>
+
+                    <p class="item-description">
+                        ${item.description || "No description available"}
+                    </p>
+
+                    <div class="item-meta">
+
+                        <span>
+                            <i class="fas fa-tag me-1"></i>
+                            ${item.category || "Other"}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            ${item.location || "Unknown location"}
+                        </span>
+
+                        <span>
+                            <i class="fas fa-calendar me-1"></i>
+                            ${item.date || "Unknown date"}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+            resultsContainer.appendChild(card);
+        });
+    }
+
+
+    // Search button
+    searchButton.addEventListener("click", () => {
+
+        const searchTerm = document
+            .getElementById("searchInput")
+            .value
+            .trim();
+
+        loadSearchItems(searchTerm);
     });
 
-    resetFilters.addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('categoryFilter').selectedIndex = 0;
-        document.getElementById('statusFilter').selectedIndex = 0;
-        document.getElementById('dateFilter').selectedIndex = 0;
-        alert('Filters have been reset.');
+
+    // Reset filters
+    resetFilters.addEventListener("click", () => {
+
+        document.getElementById("searchInput").value = "";
+        document.getElementById("categoryFilter").selectedIndex = 0;
+        document.getElementById("statusFilter").selectedIndex = 0;
+        document.getElementById("dateFilter").selectedIndex = 0;
+
+        loadSearchItems();
     });
 
 
@@ -853,6 +991,27 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     }
+    async function loadDefaultLostItems() {
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:5000/search-lost-items"
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to load lost items");
+            }
+
+            const results = await response.json();
+
+            console.log("Default lost items:", results);
+
+            displaySearchResults(results);
+
+        } catch (error) {
+            console.error("Error loading default lost items:", error);
+        }
+    }
+
 
 
 
