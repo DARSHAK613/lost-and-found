@@ -2,8 +2,8 @@ import smtplib
 import os
 from dotenv import load_dotenv
 load_dotenv()
-EMAIL_ADDRESS = os.getenv("lostandfoundadmin001@gmail.com")
-EMAIL_PASSWORD = os.getenv("foiz wefz ruqm yvab")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
