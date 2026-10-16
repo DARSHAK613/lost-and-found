@@ -2749,4 +2749,137 @@ document.addEventListener("click", async function (e) {
         loadMatchHistory();
     }
 
+  
+
 });
+  // ================= ADD USER MODAL =================
+
+// Get Add User modal elements
+const addUserButton = document.getElementById("add-user-btn");
+const addUserModalElement = document.getElementById("addUserModal");
+const addUserForm = document.getElementById("add-user-form");
+const newUserRole = document.getElementById("new-user-role");
+
+// Student fields
+const studentNameFields = document.getElementById("student-name-fields");
+const studentIdField = document.getElementById("student-id-field");
+const studentDepartmentField = document.getElementById("student-department-field");
+
+// Administrator field
+const adminNameField = document.getElementById("admin-name-field");
+
+// Password fields
+const newUserPassword = document.getElementById("new-user-password");
+const confirmUserPassword = document.getElementById("new-user-confirm-password");
+
+// Message area
+const addUserMessage = document.getElementById("add-user-message");
+
+
+// Open the modal when Add User is clicked
+if (addUserButton && addUserModalElement) {
+
+    addUserButton.addEventListener("click", function () {
+
+        addUserForm.reset();
+
+        addUserMessage.textContent = "";
+        addUserMessage.classList.add("hidden");
+
+        // Show student fields by default
+        studentNameFields.classList.remove("hidden");
+        studentIdField.parentElement.classList.remove("hidden");
+        studentDepartmentField.parentElement.classList.remove("hidden");
+
+        adminNameField.classList.add("hidden");
+
+        // Clear previous role selection
+        newUserRole.value = "";
+
+        const modal = bootstrap.Modal.getOrCreateInstance(
+            addUserModalElement
+        );
+
+        modal.show();
+
+    });
+
+}
+
+
+// Show fields according to selected role
+if (newUserRole) {
+
+    newUserRole.addEventListener("change", function () {
+
+        const selectedRole = newUserRole.value;
+
+        if (selectedRole === "student") {
+
+            studentNameFields.classList.remove("hidden");
+            studentIdField.parentElement.classList.remove("hidden");
+            studentDepartmentField.parentElement.classList.remove("hidden");
+
+            adminNameField.classList.add("hidden");
+
+        } else if (selectedRole === "admin") {
+
+            studentNameFields.classList.add("hidden");
+            studentIdField.parentElement.classList.add("hidden");
+            studentDepartmentField.parentElement.classList.add("hidden");
+
+            adminNameField.classList.remove("hidden");
+
+        } else {
+
+            studentNameFields.classList.add("hidden");
+            studentIdField.parentElement.classList.add("hidden");
+            studentDepartmentField.parentElement.classList.add("hidden");
+
+            adminNameField.classList.add("hidden");
+
+        }
+
+    });
+
+}
+
+
+// Check that passwords match
+if (addUserForm) {
+
+    addUserForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const password = newUserPassword.value;
+        const confirmPassword = confirmUserPassword.value;
+
+        addUserMessage.classList.remove("hidden");
+
+        if (password !== confirmPassword) {
+
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent = "Passwords do not match.";
+
+            return;
+
+        }
+
+        if (password.length < 8) {
+
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent =
+                "Password must contain at least 8 characters.";
+
+            return;
+
+        }
+
+        addUserMessage.className = "alert alert-success";
+        addUserMessage.textContent =
+            "Form validation successful. Account creation will be connected in the next step.";
+
+    });
+
+}
