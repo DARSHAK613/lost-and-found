@@ -283,35 +283,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // verification of otp
     // Verify OTP
-    verifyOtpBtn.addEventListener("click", async () => {
-
-        const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
-
-        const response = await fetch("http://127.0.0.1:5000/verify-otp", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: pendingUser.email,
-                otp: otpInput.value
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            alert(data.message);
-            return;
-        }
-
-        alert(data.message);
-
-        localStorage.removeItem("pendingUser");
-
+   // Verify OTP
+verifyOtpBtn.addEventListener("click", async () => {
+    const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
+    if (!pendingUser) {
+        alert("Session expired. Please try again.");
         showPage(loginPage);
+        return;
+    }
 
+    const response = await fetch("http://127.0.0.1:5000/verify-otp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: pendingUser.email,
+            otp: otpInput.value
+        })
     });
+    const data = await response.json();
+    if (!response.ok) {
+        alert(data.message);
+        return;
+    }
+    
+    alert(data.message);
+    localStorage.removeItem("pendingUser");
+    
+    // Check if this account was created by an admin
+    if (pendingUser.createdByAdmin) {
+        // Return to the admin dashboard and refresh the user list
+        showPage(dashboardContainer);
+        showDashboardPage(manageUsersPage);
+        loadUsers();
+    } else {
+        // Normal student registration goes to login page
+        showPage(loginPage);
+    }
+});
 
 
     // Resend OTP
@@ -2362,6 +2372,210 @@ ${user.status === "blocked"
         loadUsers();
 
     }
+    // ================= ADD USER MODAL =================
+
+// Get Add User modal elements
+const addUserButton = document.getElementById("add-user-btn");
+const addUserModalElement = document.getElementById("addUserModal");
+const addUserForm = document.getElementById("add-user-form");
+const newUserRole = document.getElementById("new-user-role");
+
+// Student fields
+const studentNameFields = document.getElementById("student-name-fields");
+const studentIdField = document.getElementById("student-id-field");
+const studentDepartmentField = document.getElementById("student-department-field");
+
+// Administrator field
+const adminNameField = document.getElementById("admin-name-field");
+
+// Password fields
+const newUserPassword = document.getElementById("new-user-password");
+const confirmUserPassword = document.getElementById("new-user-confirm-password");
+
+// Message area
+const addUserMessage = document.getElementById("add-user-message");
+
+
+// Open the modal when Add User is clicked
+if (addUserButton && addUserModalElement) {
+
+    addUserButton.addEventListener("click", function () {
+
+        addUserForm.reset();
+
+        addUserMessage.textContent = "";
+        addUserMessage.classList.add("hidden");
+
+        // Show student fields by default
+        studentNameFields.classList.remove("hidden");
+        studentIdField.parentElement.classList.remove("hidden");
+        studentDepartmentField.parentElement.classList.remove("hidden");
+
+        adminNameField.classList.add("hidden");
+
+        // Clear previous role selection
+        newUserRole.value = "";
+
+        const modal = bootstrap.Modal.getOrCreateInstance(
+            addUserModalElement
+        );
+
+        modal.show();
+
+    });
+
+}
+
+
+
+
+// Show fields according to selected role
+function updateAddUserFields() {
+
+    const selectedRole = newUserRole.value;
+
+    // Show Student fields only for Student
+    if (selectedRole === "student") {
+
+        studentNameFields.classList.remove("hidden");
+        studentIdField.classList.remove("hidden");
+        studentDepartmentField.classList.remove("hidden");
+
+    } else {
+
+        studentNameFields.classList.add("hidden");
+        studentIdField.classList.add("hidden");
+        studentDepartmentField.classList.add("hidden");
+
+    }
+
+    // Show Administrator Full Name only for Administrator
+    if (selectedRole === "admin") {
+
+        adminNameField.classList.remove("hidden");
+
+    } else {
+
+        adminNameField.classList.add("hidden");
+
+    }
+
+}
+
+// Listen for role changes
+if (newUserRole) {
+    newUserRole.addEventListener("change", updateAddUserFields);
+}
+
+
+// Handle Add User Form Submission (Send OTP)
+// Handle Add User Form Submission (Send OTP)
+if (addUserForm) {
+    addUserForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        
+        const password = newUserPassword.value;
+        const confirmPassword = confirmUserPassword.value;
+        const role = newUserRole.value;
+        
+        addUserMessage.classList.remove("hidden");
+        
+        if (!role) {
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent = "Please select a user type.";
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent = "Passwords do not match.";
+            return;
+        }
+
+        if (password.length < 8) {
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent = "Password must contain at least 8 characters.";
+            return;
+        }
+
+        // Collect data based on role
+        let payload = {
+            role: role,
+            email: document.getElementById("new-user-email").value.trim(),
+            phone: document.getElementById("new-user-phone").value.trim(),
+            password: password,
+            createdByAdmin: true // Flag to redirect back to dashboard later
+        };
+
+        if (role === "student") {
+            payload.firstname = document.getElementById("new-user-firstname").value.trim();
+            payload.lastname = document.getElementById("new-user-lastname").value.trim();
+            payload.studentid = document.getElementById("new-user-studentid").value.trim();
+            payload.department = document.getElementById("new-user-department").value.trim();
+            
+            if (!payload.firstname || !payload.lastname) {
+                addUserMessage.className = "alert alert-danger";
+                addUserMessage.textContent = "First Name and Last Name are required for students.";
+                return;
+            }
+        } else if (role === "admin") {
+            payload.fullname = document.getElementById("new-user-fullname").value.trim();
+            if (!payload.fullname) {
+                addUserMessage.className = "alert alert-danger";
+                addUserMessage.textContent = "Full Name is required for administrators.";
+                return;
+            }
+        }
+
+        // Disable button to prevent double submission
+        const submitBtn = addUserForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Sending OTP...";
+
+        try {
+            const response = await fetch("http://127.0.0.1:5000/send-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                addUserMessage.className = "alert alert-danger";
+                addUserMessage.textContent = data.message || "Failed to send OTP.";
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
+                return;
+            }
+
+            // Success: OTP sent
+            // Save to pendingUser (same key used by normal registration)
+            localStorage.setItem("pendingUser", JSON.stringify(payload));
+            
+            // Hide the Add User modal
+            const modalInstance = bootstrap.Modal.getInstance(addUserModalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+
+            // Show the existing Email Verification Page
+            showPage(emailVerificationPage);
+            verifyOtpBtn.disabled = false;
+            startOtpTimer();
+            resendOtpBtn.disabled = true;
+            startResendTimer();
+            
+        } catch (error) {
+            console.error("Add User OTP Error:", error);
+            addUserMessage.className = "alert alert-danger";
+            addUserMessage.textContent = "Network error. Please try again.";
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalBtnText;
+        }
+    });
+}
 
 });
 async function loadMatches() {
@@ -2752,134 +2966,4 @@ document.addEventListener("click", async function (e) {
   
 
 });
-  // ================= ADD USER MODAL =================
-
-// Get Add User modal elements
-const addUserButton = document.getElementById("add-user-btn");
-const addUserModalElement = document.getElementById("addUserModal");
-const addUserForm = document.getElementById("add-user-form");
-const newUserRole = document.getElementById("new-user-role");
-
-// Student fields
-const studentNameFields = document.getElementById("student-name-fields");
-const studentIdField = document.getElementById("student-id-field");
-const studentDepartmentField = document.getElementById("student-department-field");
-
-// Administrator field
-const adminNameField = document.getElementById("admin-name-field");
-
-// Password fields
-const newUserPassword = document.getElementById("new-user-password");
-const confirmUserPassword = document.getElementById("new-user-confirm-password");
-
-// Message area
-const addUserMessage = document.getElementById("add-user-message");
-
-
-// Open the modal when Add User is clicked
-if (addUserButton && addUserModalElement) {
-
-    addUserButton.addEventListener("click", function () {
-
-        addUserForm.reset();
-
-        addUserMessage.textContent = "";
-        addUserMessage.classList.add("hidden");
-
-        // Show student fields by default
-        studentNameFields.classList.remove("hidden");
-        studentIdField.parentElement.classList.remove("hidden");
-        studentDepartmentField.parentElement.classList.remove("hidden");
-
-        adminNameField.classList.add("hidden");
-
-        // Clear previous role selection
-        newUserRole.value = "";
-
-        const modal = bootstrap.Modal.getOrCreateInstance(
-            addUserModalElement
-        );
-
-        modal.show();
-
-    });
-
-}
-
-
-// Show fields according to selected role
-if (newUserRole) {
-
-    newUserRole.addEventListener("change", function () {
-
-        const selectedRole = newUserRole.value;
-
-        if (selectedRole === "student") {
-
-            studentNameFields.classList.remove("hidden");
-            studentIdField.parentElement.classList.remove("hidden");
-            studentDepartmentField.parentElement.classList.remove("hidden");
-
-            adminNameField.classList.add("hidden");
-
-        } else if (selectedRole === "admin") {
-
-            studentNameFields.classList.add("hidden");
-            studentIdField.parentElement.classList.add("hidden");
-            studentDepartmentField.parentElement.classList.add("hidden");
-
-            adminNameField.classList.remove("hidden");
-
-        } else {
-
-            studentNameFields.classList.add("hidden");
-            studentIdField.parentElement.classList.add("hidden");
-            studentDepartmentField.parentElement.classList.add("hidden");
-
-            adminNameField.classList.add("hidden");
-
-        }
-
-    });
-
-}
-
-
-// Check that passwords match
-if (addUserForm) {
-
-    addUserForm.addEventListener("submit", function (event) {
-
-        event.preventDefault();
-
-        const password = newUserPassword.value;
-        const confirmPassword = confirmUserPassword.value;
-
-        addUserMessage.classList.remove("hidden");
-
-        if (password !== confirmPassword) {
-
-            addUserMessage.className = "alert alert-danger";
-            addUserMessage.textContent = "Passwords do not match.";
-
-            return;
-
-        }
-
-        if (password.length < 8) {
-
-            addUserMessage.className = "alert alert-danger";
-            addUserMessage.textContent =
-                "Password must contain at least 8 characters.";
-
-            return;
-
-        }
-
-        addUserMessage.className = "alert alert-success";
-        addUserMessage.textContent =
-            "Form validation successful. Account creation will be connected in the next step.";
-
-    });
-
-}
+  

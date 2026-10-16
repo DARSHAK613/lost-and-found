@@ -274,42 +274,55 @@ def home():
 
 @app.route("/send-otp", methods=["POST"])
 def send_otp():
-
     data = request.json
+    email = data.get("email", "").strip().lower()
+    role = data.get("role", "student").strip().lower()
+    
+    if not email:
+        return jsonify({"message": "Email is required."}), 400
 
-    email = data.get("email").strip().lower()
-
-    # Check if email already exists
-    if users.find_one({"email": email}):
-        return jsonify({"message": "Email already registered"}), 400
+    # Check if email already exists in students OR admins
+    if users.find_one({"email": email}) or admins.find_one({"email": email}):
+        return jsonify({"message": "Email already registered. Please use another email."}), 400
 
     # Generate 6-digit OTP
     otp = str(random.randint(100000, 999999))
 
-    # Remove any previous pending registration
+    # Remove any previous pending registration for this email
     pending_users.delete_many({"email": email})
 
-    # Save user details with OTP
-    pending_users.insert_one({
-        "firstname": data.get("firstname"),
-        "lastname": data.get("lastname"),
-        "fullname": data.get("firstname") + " " + data.get("lastname"),
+    # Prepare base data to save in pending_users
+    pending_data = {
         "email": email,
-        "phone": data.get("phone"),
-        "studentid": data.get("studentid"),
-        "department": data.get("department"),
-        "password": generate_password_hash(data.get("password")),
+        "phone": data.get("phone", ""),
+        "password": generate_password_hash(data.get("password", "")),
+        "role": role,
         "otp": otp,
         "created_at": datetime.now(timezone.utc)
-    })
+    }
+
+    # Add role-specific fields
+    if role == "admin":
+        pending_data["fullname"] = data.get("fullname", "").strip()
+    else:
+        # Default to student if role is not admin
+        firstname = data.get("firstname", "").strip()
+        lastname = data.get("lastname", "").strip()
+        pending_data["firstname"] = firstname
+        pending_data["lastname"] = lastname
+        pending_data["fullname"] = f"{firstname} {lastname}".strip()
+        pending_data["studentid"] = data.get("studentid", "")
+        pending_data["department"] = data.get("department", "")
+
+    # Save user details with OTP
+    pending_users.insert_one(pending_data)
 
     # Send Email
     if send_otp_email(email, otp):
         return jsonify({"message": "OTP sent successfully."})
 
-    # If email sending fails
+    # If email sending fails, clean up
     pending_users.delete_one({"email": email})
-
     return jsonify({"message": "Failed to send OTP"}), 500
 
 
@@ -317,45 +330,53 @@ def send_otp():
 @app.route("/verify-otp", methods=["POST"])
 def verify_otp():
     print("VERIFY OTP CALLED")
-
     data = request.json
-
-    email = data.get("email").strip().lower()
-    otp = data.get("otp").strip()
-
+    email = data.get("email", "").strip().lower()
+    otp = data.get("otp", "").strip()
+    
     pending_user = pending_users.find_one({"email": email})
-
     if not pending_user:
         return jsonify({"message": "Registration session expired."}), 400
 
-# Check OTP expiry (5 minutes)
+    # Check OTP expiry (5 minutes)
     otp_age = datetime.now(timezone.utc) - pending_user["created_at"]
-
     if otp_age > timedelta(minutes=5):
         pending_users.delete_one({"email": email})
         return jsonify({"message": "OTP expired. Please request a new OTP."}), 400
 
     if pending_user["otp"] != otp:
         return jsonify({"message": "Invalid OTP"}), 400
-    
-    users.insert_one({
-        "firstname": pending_user["firstname"],
-        "lastname": pending_user["lastname"],
-        "fullname": pending_user["fullname"],
-        "email": pending_user["email"],
-        "phone": pending_user["phone"],
-        "studentid": pending_user["studentid"],
-        "department": pending_user["department"],
-        "password": pending_user["password"],
 
-        "status": "active",
-    "blocked_reason": "",
-    "blocked_by": "",
-    "blocked_date": ""
-    })
+    # Determine role (default to student for backward compatibility)
+    role = pending_user.get("role", "student")
+
+    if role == "admin":
+        # Insert into admins collection
+        admins.insert_one({
+            "fullname": pending_user.get("fullname", ""),
+            "email": pending_user["email"],
+            "phone": pending_user.get("phone", ""),
+            "password": pending_user["password"],
+            "status": "active"
+        })
+    else:
+        # Insert into users collection (Student)
+        users.insert_one({
+            "firstname": pending_user.get("firstname", ""),
+            "lastname": pending_user.get("lastname", ""),
+            "fullname": pending_user.get("fullname", ""),
+            "email": pending_user["email"],
+            "phone": pending_user.get("phone", ""),
+            "studentid": pending_user.get("studentid", ""),
+            "department": pending_user.get("department", ""),
+            "password": pending_user["password"],
+            "status": "active",
+            "blocked_reason": "",
+            "blocked_by": "",
+            "blocked_date": ""
+        })
 
     pending_users.delete_one({"email": email})
-
     return jsonify({"message": "Account created successfully!"})
 
 
@@ -403,13 +424,28 @@ def login():
     email = data.get("email", "").strip().lower()
     password = data.get("password", "").strip()
 
-    # ---------- Check Admin First ----------
+        # ---------- Check Admin First ----------
     admin = admins.find_one({"email": email})
-
     if admin:
-
-        if admin["password"] != password:
+        stored_password = admin.get("password", "")
+        password_correct = False
+        
+        # Try checking as a secure hash first
+        try:
+            password_correct = check_password_hash(stored_password, password)
+        except ValueError:
+            # If it's an old plaintext password, fall back to direct comparison
+            password_correct = (stored_password == password)
+            
+        if not password_correct:
             return jsonify({"message": "Incorrect password"}), 401
+
+        # Security Upgrade: If it was an old plaintext password, hash it now
+        if stored_password == password:
+            admins.update_one(
+                {"_id": admin["_id"]},
+                {"$set": {"password": generate_password_hash(password)}}
+            )
 
         return jsonify({
             "message": "Admin login successful",
@@ -563,19 +599,26 @@ def change_password():
     current_password = data.get("current_password")
     new_password = data.get("new_password")
 
-    # ---------- Check Admin ----------
+        # ---------- Check Admin ----------
     admin = admins.find_one({"email": email})
-
     if admin:
-
-        if admin["password"] != current_password:
+        stored_password = admin.get("password", "")
+        current_correct = False
+        
+        try:
+            current_correct = check_password_hash(stored_password, current_password)
+        except ValueError:
+            current_correct = (stored_password == current_password)
+            
+        if not current_correct:
             return jsonify({"message": "Current password is incorrect"}), 400
-
+            
+        # Save the new password as a secure hash
         admins.update_one(
             {"email": email},
             {
                 "$set": {
-                    "password": new_password
+                    "password": generate_password_hash(new_password)
                 }
             }
         )
