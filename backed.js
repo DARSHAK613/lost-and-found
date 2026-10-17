@@ -1,6 +1,10 @@
 //i add this comment for testing
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Define API Base URL dynamically (works for both localhost and production deployment)
+    const API_BASE = (window.location.origin === "null" || window.location.protocol === "file:") 
+        ? "http://127.0.0.1:5000" 
+        : window.location.origin;
     // Page Navigation
     const loginPage = document.getElementById('login-page');
     const registerPage = document.getElementById('register-page');
@@ -2578,6 +2582,7 @@ if (addUserForm) {
 }
 
 });
+//start form here
 async function loadMatches() {
     try {
         const response = await fetch("http://127.0.0.1:5000/admin/matches");

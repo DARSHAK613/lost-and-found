@@ -77,20 +77,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 CORS(app)
-
 UPLOAD_FOLDER = "uploads"
-
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 client = MongoClient(
-    "mongodb://localhost:27017/",
+    MONGO_URI,
     tz_aware=True
 )
-
 db = client["lost_found"].with_options(
     codec_options=CodecOptions(tz_aware=True)
 )
@@ -629,20 +624,26 @@ def change_password():
             "message": "Admin password changed successfully"
         })
 
-    # ---------- Check User ----------
+        # ---------- Check User ----------
     user = users.find_one({"email": email})
-
     if not user:
         return jsonify({"message": "User not found"}), 404
-
-    if user["password"] != current_password:
+        
+    stored_password = user.get("password", "")
+    current_correct = False
+    try:
+        current_correct = check_password_hash(stored_password, current_password)
+    except ValueError:
+        current_correct = (stored_password == current_password)
+        
+    if not current_correct:
         return jsonify({"message": "Current password is incorrect"}), 400
-
+        
     users.update_one(
         {"email": email},
         {
             "$set": {
-                "password": new_password
+                "password": generate_password_hash(new_password)
             }
         }
     )
@@ -1648,10 +1649,8 @@ def get_match_details(lost_id, found_id):
 def confirm_match():
 
     data = request.json
-
     lost_id = data.get("lost_id")
     found_id = data.get("found_id")
-    match_history = db["match_history"]
 
     # Check IDs are provided
     if not lost_id or not found_id:
@@ -1911,4 +1910,5 @@ def uploaded_file(filename):
 
 if __name__ == "__main__":
     print(app.url_map)
-    app.run(debug=True)
+    DEBUG_MODE = os.getenv("FLASK_DEBUG", "False").lower() in ["true", "1", "yes"]
+    app.run(debug=DEBUG_MODE)
