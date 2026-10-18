@@ -1,10 +1,12 @@
 //i add this comment for testing
 
+//i add this comment for testing
 document.addEventListener('DOMContentLoaded', function () {
-    // Define API Base URL dynamically (works for both localhost and production deployment)
-    const API_BASE = (window.location.origin === "null" || window.location.protocol === "file:") 
-        ? "http://127.0.0.1:5000" 
-        : window.location.origin;
+    // Use the deployed Render backend in production and localhost during local development
+    const API_BASE = (window.location.protocol === "file:" || window.location.origin === "null")
+        ? "http://127.0.0.1:5000"
+        : "https://lost-and-found-m4s7.onrender.com";
+
     // Page Navigation
     const loginPage = document.getElementById('login-page');
     const registerPage = document.getElementById('register-page');
@@ -536,7 +538,7 @@ verifyOtpBtn.addEventListener("click", async () => {
         const email = document.querySelector("#login-email").value;
         const password = document.querySelector("#login-password").value;
 
-        const res = await fetch("http://127.0.0.1:5000/login", {
+        const res = await fetch(`${API_BASE}/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
