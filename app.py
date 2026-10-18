@@ -1,4 +1,5 @@
 import resend
+import requests
 import smtplib
 import os
 from dotenv import load_dotenv
@@ -145,28 +146,60 @@ Lost & Found Team
 """
 
     try:
-        api_key = os.getenv("RESEND_API_KEY")
+        api_key = os.getenv("BREVO_API_KEY")
 
         if not api_key:
-            print("Email Error: RESEND_API_KEY is missing")
+            print("Email Error: BREVO_API_KEY is missing")
             return False
 
-        resend.api_key = api_key
+        sender_email = os.getenv("BREVO_SENDER_EMAIL")
 
-        params = {
-            "from": "Lost & Found <onboarding@resend.dev>",
-            "to": [receiver_email],
-            "subject": subject,
-            "text": body,
+        if not sender_email:
+            print("Email Error: BREVO_SENDER_EMAIL is missing")
+            return False
+
+        url = "https://api.brevo.com/v3/smtp/email"
+
+        headers = {
+            "accept": "application/json",
+            "api-key": api_key,
+            "content-type": "application/json"
         }
 
-        response = resend.Emails.send(params)
+        payload = {
+            "sender": {
+                "name": "Lost & Found Team",
+                "email": sender_email
+            },
+            "to": [
+                {
+                    "email": receiver_email
+                }
+            ],
+            "subject": subject,
+            "textContent": body
+        }
 
-        print("OTP email sent successfully:", response)
-        return True
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=20
+        )
+
+        if response.status_code in (200, 201, 202):
+            print("OTP email accepted by Brevo:", response.status_code)
+            return True
+
+        print(
+            "Brevo Email Error:",
+            response.status_code,
+            response.text
+        )
+        return False
 
     except Exception as e:
-        print("Resend Email Error:", repr(e))
+        print("Brevo Email Error:", repr(e))
         return False
     
 
