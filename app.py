@@ -79,7 +79,14 @@ app = Flask(__name__)
 
 CORS(
     app,
-    resources={r"/*": {"origins": "https://dreamy-monstera-2a025a.netlify.app"}},
+    resources={
+        r"/*": {
+            "origins": [
+                "https://dreamy-monstera-2a025a.netlify.app",
+                "https://lostandfoundsysteam.netlify.app"
+            ]
+        }
+    },
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"]
 )
