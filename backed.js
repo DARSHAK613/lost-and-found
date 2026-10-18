@@ -298,7 +298,7 @@ verifyOtpBtn.addEventListener("click", async () => {
         return;
     }
 
-    const response = await fetch("http://127.0.0.1:5000/verify-otp", {
+    const response = await fetch("https://lost-and-found-m4s7.onrender.com/verify-otp", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -335,7 +335,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
         const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
 
-        const response = await fetch("http://127.0.0.1:5000/resend-otp", {
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/resend-otp", {
 
             method: "POST",
 
@@ -485,7 +485,7 @@ verifyOtpBtn.addEventListener("click", async () => {
             return;
         }
 
-        const response = await fetch("http://127.0.0.1:5000/send-otp", {
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/send-otp", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -672,9 +672,9 @@ verifyOtpBtn.addEventListener("click", async () => {
         let url;
 
         if (role === "admin") {
-            url = `http://127.0.0.1:5000/admin/search-items?q=${encodeURIComponent(searchTerm)}`;
+            url = `https://lost-and-found-m4s7.onrender.com/admin/search-items?q=${encodeURIComponent(searchTerm)}`;
         } else {
-            url = `http://127.0.0.1:5000/search-lost-items?q=${encodeURIComponent(searchTerm)}`;
+            url = `https://lost-and-found-m4s7.onrender.com/search-lost-items?q=${encodeURIComponent(searchTerm)}`;
         }
 
         try {
@@ -966,7 +966,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 formData.append("image", imageInput.files[0]);
             }
 
-            const response = await fetch("http://127.0.0.1:5000/lost-item", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/lost-item", {
                 method: "POST",
                 body: formData
             });
@@ -1024,7 +1024,7 @@ verifyOtpBtn.addEventListener("click", async () => {
             }
 
             const response = await fetch(
-                "http://127.0.0.1:5000/found-item",
+                "https://lost-and-found-m4s7.onrender.com/found-item",
                 {
                     method: "POST",
                     body: formData
@@ -1063,7 +1063,7 @@ verifyOtpBtn.addEventListener("click", async () => {
             e.preventDefault();
             const user = JSON.parse(localStorage.getItem("user"));
 
-            const response = await fetch("http://127.0.0.1:5000/quick-lost-item", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/quick-lost-item", {
 
                 method: "POST",
 
@@ -1115,7 +1115,7 @@ verifyOtpBtn.addEventListener("click", async () => {
             e.preventDefault();
             const user = JSON.parse(localStorage.getItem("user"));
 
-            const response = await fetch("http://127.0.0.1:5000/quick-found-item", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/quick-found-item", {
 
                 method: "POST",
 
@@ -1156,7 +1156,7 @@ verifyOtpBtn.addEventListener("click", async () => {
     async function loadDefaultLostItems() {
         try {
             const response = await fetch(
-                "http://127.0.0.1:5000/search-lost-items"
+                "https://lost-and-found-m4s7.onrender.com/search-lost-items"
             );
 
             if (!response.ok) {
@@ -1179,7 +1179,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     async function loadTotalFoundItems() {
 
-        const response = await fetch("http://127.0.0.1:5000/total-found-items");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/total-found-items");
 
         const data = await response.json();
 
@@ -1191,7 +1191,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     async function loadTotalLostItems() {
 
-        const response = await fetch("http://127.0.0.1:5000/total-lost-items");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/total-lost-items");
 
         const data = await response.json();
 
@@ -1202,7 +1202,7 @@ verifyOtpBtn.addEventListener("click", async () => {
     async function loadTotalReturnedItems() {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/total-returned-items"
+            "https://lost-and-found-m4s7.onrender.com/total-returned-items"
         );
 
         const data = await response.json();
@@ -1213,7 +1213,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     async function loadAdminTotalFoundItems() {
 
-        const response = await fetch("http://127.0.0.1:5000/total-found-items");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/total-found-items");
         const data = await response.json();
 
         document.getElementById("admin-total-found-items").innerText =
@@ -1223,7 +1223,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     async function loadAdminTotalLostItems() {
 
-        const response = await fetch("http://127.0.0.1:5000/total-lost-items");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/total-lost-items");
         const data = await response.json();
 
         document.getElementById("admin-total-lost-items").innerText =
@@ -1286,7 +1286,7 @@ verifyOtpBtn.addEventListener("click", async () => {
         if (!user) return;
 
         const response = await fetch(
-            `http://127.0.0.1:5000/recent-activities?email=${user.email}`
+            `https://lost-and-found-m4s7.onrender.com/recent-activities?email=${user.email}`
         );
 
         const activities = await response.json();
@@ -1327,7 +1327,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
         console.log("loadUsers() called");
 
-        const response = await fetch("http://127.0.0.1:5000/admin/users");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/admin/users");
 
         const users = await response.json();
 
@@ -1354,7 +1354,7 @@ verifyOtpBtn.addEventListener("click", async () => {
     }
     async function loadAdminCount() {
         try {
-            const response = await fetch("http://127.0.0.1:5000/admin/admin-count");
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/admin/admin-count");
 
             const data = await response.json();
 
@@ -1368,7 +1368,7 @@ verifyOtpBtn.addEventListener("click", async () => {
     let reportType = "all";
     let reportStatus = "all";
     async function loadReports() {
-        const response = await fetch("http://127.0.0.1:5000/admin/reports");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/admin/reports");
 
         const reports = await response.json();
         const filteredReports = reports.filter(report => {
@@ -1497,7 +1497,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 approveBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
-                        "http://127.0.0.1:5000/admin/approve-report",
+                        "https://lost-and-found-m4s7.onrender.com/admin/approve-report",
                         {
                             method: "POST",
                             headers: {
@@ -1526,7 +1526,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 rejectBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
-                        "http://127.0.0.1:5000/admin/reject-report",
+                        "https://lost-and-found-m4s7.onrender.com/admin/reject-report",
                         {
                             method: "POST",
                             headers: {
@@ -1559,7 +1559,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 returnBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
-                        "http://127.0.0.1:5000/admin/return-report",
+                        "https://lost-and-found-m4s7.onrender.com/admin/return-report",
                         {
                             method: "POST",
                             headers: {
@@ -1591,7 +1591,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 unreturnBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
-                        "http://127.0.0.1:5000/admin/not-returned",
+                        "https://lost-and-found-m4s7.onrender.com/admin/not-returned",
                         {
                             method: "POST",
                             headers: {
@@ -1621,7 +1621,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 unrejectBtn.addEventListener("click", async () => {
 
                     const response = await fetch(
-                        "http://127.0.0.1:5000/admin/unreject-report",
+                        "https://lost-and-found-m4s7.onrender.com/admin/unreject-report",
                         {
                             method: "POST",
                             headers: {
@@ -1696,7 +1696,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
         if (report.image) {
 
-            img.src = "http://127.0.0.1:5000/uploads/" + report.image;
+            img.src = "https://lost-and-found-m4s7.onrender.com/uploads/" + report.image;
 
             img.style.display = "block";
 
@@ -1719,7 +1719,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     async function loadRecentLostItems() {
 
-        const response = await fetch("http://127.0.0.1:5000/recent-lost-items");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/recent-lost-items");
 
         const items = await response.json();
 
@@ -1853,7 +1853,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
             }
 
-            const response = await fetch("http://127.0.0.1:5000/update-profile", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/update-profile", {
 
                 method: "PUT",
 
@@ -1906,7 +1906,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                 return;
             }
 
-            const response = await fetch("http://127.0.0.1:5000/change-password", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/change-password", {
 
                 method: "PUT",
 
@@ -2238,7 +2238,7 @@ ${user.status === "blocked"
         try {
 
             const response = await fetch(
-                "http://127.0.0.1:5000/admin/update-user",
+                "https://lost-and-found-m4s7.onrender.com/admin/update-user",
                 {
                     method: "PUT",
 
@@ -2321,7 +2321,7 @@ ${user.status === "blocked"
             }
 
             const response = await fetch(
-                "http://127.0.0.1:5000/admin/block-user",
+                "https://lost-and-found-m4s7.onrender.com/admin/block-user",
                 {
                     method: "POST",
 
@@ -2357,7 +2357,7 @@ ${user.status === "blocked"
         }
 
         const response = await fetch(
-            "http://127.0.0.1:5000/admin/unblock-user",
+            "https://lost-and-found-m4s7.onrender.com/admin/unblock-user",
             {
                 method: "POST",
 
@@ -2540,7 +2540,7 @@ if (addUserForm) {
         submitBtn.innerText = "Sending OTP...";
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/send-otp", {
+            const response = await fetch("https://lost-and-found-m4s7.onrender.com/send-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -2587,7 +2587,7 @@ if (addUserForm) {
 //start form here
 async function loadMatches() {
     try {
-        const response = await fetch("http://127.0.0.1:5000/admin/matches");
+        const response = await fetch("https://lost-and-found-m4s7.onrender.com/admin/matches");
 
         const matches = await response.json();
 
@@ -2649,7 +2649,7 @@ document.addEventListener("click", async function (e) {
         try {
 
             const response = await fetch(
-                `http://127.0.0.1:5000/admin/match/${lostId}/${foundId}`
+                `https://lost-and-found-m4s7.onrender.com/admin/match/${lostId}/${foundId}`
             );
 
             const data = await response.json();
@@ -2686,7 +2686,7 @@ document.addEventListener("click", async function (e) {
             const lostImage = document.getElementById("match-lost-image");
 
             if (lost.image) {
-                lostImage.src = "http://127.0.0.1:5000/uploads/" + lost.image;
+                lostImage.src = "https://lost-and-found-m4s7.onrender.com/uploads/" + lost.image;
                 lostImage.style.display = "inline-block";
             } else {
                 lostImage.style.display = "none";
@@ -2729,7 +2729,7 @@ document.addEventListener("click", async function (e) {
             const foundImage = document.getElementById("match-found-image");
 
             if (found.image) {
-                foundImage.src = "http://127.0.0.1:5000/uploads/" + found.image;
+                foundImage.src = "https://lost-and-found-m4s7.onrender.com/uploads/" + found.image;
                 foundImage.style.display = "inline-block";
             } else {
                 foundImage.style.display = "none";
@@ -2780,7 +2780,7 @@ document.addEventListener("click", async function (e) {
         try {
 
             const response = await fetch(
-                "http://127.0.0.1:5000/admin/confirm-match",
+                "https://lost-and-found-m4s7.onrender.com/admin/confirm-match",
                 {
                     method: "POST",
                     headers: {
@@ -2822,7 +2822,7 @@ async function loadMatchHistory() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/admin/match-history"
+            "https://lost-and-found-m4s7.onrender.com/admin/match-history"
         );
 
         const history = await response.json();
@@ -2907,7 +2907,7 @@ document.addEventListener("click", async function (e) {
     const foundId = e.target.dataset.foundId;
 
     const response = await fetch(
-        "http://127.0.0.1:5000/admin/not-match",
+        "https://lost-and-found-m4s7.onrender.com/admin/not-match",
         {
             method: "POST",
 
@@ -2946,7 +2946,7 @@ document.addEventListener("click", async function (e) {
     const foundId = e.target.dataset.foundId;
 
     const response = await fetch(
-        "http://127.0.0.1:5000/admin/item-returned",
+        "https://lost-and-found-m4s7.onrender.com/admin/item-returned",
         {
             method: "POST",
 
