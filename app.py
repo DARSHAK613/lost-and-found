@@ -153,7 +153,7 @@ Lost & Found Team
     message.attach(MIMEText(body, "plain"))
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.sendmail(
@@ -214,7 +214,7 @@ Lost & Found Team
     message.attach(MIMEText(body, "plain"))
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
@@ -251,7 +251,7 @@ def send_match_notification_email(receiver_email, subject, body):
     message.attach(MIMEText(body, "plain"))
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
         server.starttls()
 
         server.login(
