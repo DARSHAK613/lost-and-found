@@ -1,3 +1,4 @@
+import resend
 import smtplib
 import os
 from dotenv import load_dotenv
@@ -127,11 +128,9 @@ def add_activity(email, activity):
     })
 
 def send_otp_email(receiver_email, otp):
-
     subject = "Lost & Found - Email Verification OTP"
 
-    body = f"""
-Hello,
+    body = f"""Hello,
 
 Your OTP for Lost & Found Account Verification is:
 
@@ -145,28 +144,29 @@ Regards,
 Lost & Found Team
 """
 
-    message = MIMEMultipart()
-    message["From"] = EMAIL_ADDRESS
-    message["To"] = receiver_email
-    message["Subject"] = subject
-
-    message.attach(MIMEText(body, "plain"))
-
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.sendmail(
-            EMAIL_ADDRESS,
-            receiver_email,
-            message.as_string()
-        )
-        server.quit()
+        api_key = os.getenv("RESEND_API_KEY")
 
+        if not api_key:
+            print("Email Error: RESEND_API_KEY is missing")
+            return False
+
+        resend.api_key = api_key
+
+        params = {
+            "from": "Lost & Found <onboarding@resend.dev>",
+            "to": [receiver_email],
+            "subject": subject,
+            "text": body,
+        }
+
+        response = resend.Emails.send(params)
+
+        print("OTP email sent successfully:", response)
         return True
 
     except Exception as e:
-        print("Email Error:", e)
+        print("Resend Email Error:", repr(e))
         return False
     
 
@@ -328,7 +328,9 @@ def send_otp():
 
     # Send Email
     if send_otp_email(email, otp):
-        return jsonify({"message": "OTP sent successfully."})
+        return jsonify({"message": "OTP sent successfully."}), 200
+    else:
+        return jsonify({"message": "Failed to send OTP. Please try again."}), 500
 
     # If email sending fails, clean up
     pending_users.delete_one({"email": email})
