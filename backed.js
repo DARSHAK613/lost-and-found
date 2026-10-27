@@ -228,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
         loadTotalFoundItems();
         loadTotalLostItems();
         loadTotalReturnedItems();
+        loadTotalUnclaimedItems();
     }
 
 
@@ -1220,6 +1221,24 @@ verifyOtpBtn.addEventListener("click", async () => {
 
     }
 
+    async function loadTotalUnclaimedItems() {
+        const response = await fetch(
+            "https://lost-and-found-m4s7.onrender.com/total-unclaimed-items"
+        );
+        const data = await response.json();
+
+        const adminUnclaimedItems = document.getElementById("admin-unclaimed-items");
+        const userUnclaimedItems = document.getElementById("user-unclaimed-items");
+
+        if (adminUnclaimedItems) {
+            adminUnclaimedItems.innerText = data.total;
+        }
+
+        if (userUnclaimedItems) {
+            userUnclaimedItems.innerText = data.total;
+        }
+    }
+
     async function loadAdminTotalFoundItems() {
 
         const response = await fetch("https://lost-and-found-m4s7.onrender.com/total-found-items");
@@ -1524,6 +1543,7 @@ verifyOtpBtn.addEventListener("click", async () => {
                     alert(data.message);
 
                     loadReports();
+                    loadTotalUnclaimedItems();
 
                 });
 
@@ -1587,6 +1607,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
                     loadReports();
                     loadTotalReturnedItems();
+                    loadTotalUnclaimedItems();
 
                 });
 
@@ -1619,6 +1640,7 @@ verifyOtpBtn.addEventListener("click", async () => {
 
                     loadReports();
                     loadTotalReturnedItems();
+                    loadTotalUnclaimedItems();
 
                 });
 
@@ -2978,6 +3000,7 @@ document.addEventListener("click", async function (e) {
     if (response.ok) {
         loadMatchHistory();
         loadTotalReturnedItems();
+        loadTotalUnclaimedItems();
     }
 
   

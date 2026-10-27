@@ -896,6 +896,15 @@ def total_returned_items():
     })
 
 
+@app.route("/total-unclaimed-items", methods=["GET"])
+def total_unclaimed_items():
+    total = found_items.count_documents({"status": "Approved"})
+
+    return jsonify({
+        "total": total
+    })
+
+
 
 
 @app.route("/recent-lost-items", methods=["GET"])
