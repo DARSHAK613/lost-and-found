@@ -869,11 +869,27 @@ def total_lost_items():
 
 @app.route("/total-returned-items", methods=["GET"])
 def total_returned_items():
+    returned_matches = list(match_history.find(
+        {"status": "Item Returned"},
+        {"lost_id": 1, "found_id": 1}
+    ))
+    returned_pairs = {
+        (match.get("lost_id"), match.get("found_id"))
+        for match in returned_matches
+        if match.get("lost_id") and match.get("found_id")
+    }
+    matched_lost_ids = list({lost_id for lost_id, _ in returned_pairs})
+    matched_found_ids = list({found_id for _, found_id in returned_pairs})
 
-    total = (
-        found_items.count_documents({"status": "Returned"}) +
-        lost_items.count_documents({"status": "Returned"})
-    )
+    total = len(returned_pairs)
+    total += lost_items.count_documents({
+        "status": "Returned",
+        "_id": {"$nin": matched_lost_ids}
+    })
+    total += found_items.count_documents({
+        "status": "Returned",
+        "_id": {"$nin": matched_found_ids}
+    })
 
     return jsonify({
         "total": total

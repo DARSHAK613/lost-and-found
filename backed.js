@@ -1207,7 +1207,16 @@ verifyOtpBtn.addEventListener("click", async () => {
 
         const data = await response.json();
 
-        document.getElementById("returned-items").innerText = data.total;
+        const adminReturnedItems = document.getElementById("returned-items");
+        const userReturnedItems = document.getElementById("user-returned-items");
+
+        if (adminReturnedItems) {
+            adminReturnedItems.innerText = data.total;
+        }
+
+        if (userReturnedItems) {
+            userReturnedItems.innerText = data.total;
+        }
 
     }
 
@@ -2968,6 +2977,7 @@ document.addEventListener("click", async function (e) {
 
     if (response.ok) {
         loadMatchHistory();
+        loadTotalReturnedItems();
     }
 
   
