@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Lost & Found Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="forntend.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="auth-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card auth-card">
+                        <div class="auth-header">
+                            <h2><i class="fas fa-search me-2"></i>Digital Lost & Found</h2>
+                            <p class="mt-2">Sign in to your account</p>
+                        </div>
+                        <div class="auth-body">
+                            <form id="login-form">
+                                <div class="mb-3">
+                                    <label for="login-email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="login-email"
+                                            placeholder="Enter your email" required>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="login-password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="login-password"
+                                            placeholder="Enter your password" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-0">Don't have an account? <a href="#" id="show-register"
+                                            class="text-primary fw-bold">Register Now</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="auth-container hidden">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card auth-card">
+                        <div class="auth-header">
+                            <h2><i class="fas fa-user-plus me-2"></i>Create Account</h2>
+                            <p class="mt-2">Register for a new account</p>
+                        </div>
+                        <div class="auth-body">
+                            <form id="register-form">
+                                <div class="mb-3">
+                                    <label for="register-firstname" class="form-label">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="register-firstname"
+                                            placeholder="Enter your first name" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="register-lastname" class="form-label">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="register-lastname"
+                                            placeholder="Enter your last name" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="register-email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="register-email"
+                                            placeholder="Enter your email" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="register-phone" class="form-label">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        <input type="tel" class="form-control" id="register-phone"
+                                            placeholder="Enter your phone number" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="register-studentid" class="form-label">Student ID</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        <input type="text" class="form-control" id="register-studentid"
+                                            placeholder="Enter your student ID" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="register-department" class="form-label">Department</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                        <input type="text" class="form-control" id="register-department"
+                                            placeholder="Enter your department" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="register-password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="register-password"
+                                            placeholder="Create a password" required>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="confirmPassword"
+                                            placeholder="Confirm your password" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid mb-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">Create Account</button>
+                                </div>
+                                <div class="text-center">
+                                    <p class="mb-0">Already have an account? <a href="#" id="show-login"
+                                            class="text-primary fw-bold">Sign In</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--email verificationn page -->
+    <div id="email-verification-page" class="auth-container hidden">
+
+        <div class="container mt-5">
+
+            <div class="row justify-content-center">
+
+                <div class="col-md-6">
+
+                    <div class="card shadow p-4">
+
+                        <h2 class="text-center mb-3">
+                            Verify Your Email
+                        </h2>
+
+                        <p class="text-center">
+                            Enter the 6-digit code sent to your email.
+                        </p>
+
+                        <p id="otp-timer" class="text-center text-danger fw-bold mb-3">
+                            OTP expires in 05:00
+                        </p>
+
+                        <input type="text" id="otp-input" class="form-control mb-3" maxlength="6"
+                            placeholder="Enter OTP">
+
+                        <button id="verify-otp-btn" class="btn btn-primary w-100 mb-2">
+
+                            Verify OTP
+
+                        </button>
+
+                        <button id="resend-otp-btn" class="btn btn-outline-secondary w-100">
+
+                            Resend OTP
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div id="dashboard-container" class="dashboard-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-search"></i>
+                    <span class="brand-name">Lost & Found</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+
+                <li class="sidebar-item">
+                    <div class="user-only">
+                        <a href="#" class="sidebar-link active" data-page="dashboard">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="sidebar-item admin-item">
+                    <a href="#" class="sidebar-link" id="manage-users-link" data-page="manage-users">
+                        <i class="fas fa-users"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item admin-item">
+                    <a href="#" class="sidebar-link" id="report-management-link" data-page="report-management">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Report Management</span>
+                    </a>
+                </li>
+                <li class="sidebar-item admin-item">
+                    <a href="#" class="sidebar-link" id="potential-matches-link" data-page="potential-matches">
+                        <i class="fas fa-link"></i>
+                        <span>Potential Matches</span>
+                    </a>
+                </li>
+
+                <div class="user-only">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="report-lost">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Report Lost Item</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" data-page="report-found">
+                            <i class="fas fa-plus-square"></i>
+                            <span>Report Found Item</span>
+                        </a>
+                    </li>
+                </div>
+
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="search-items">
+                        <i class="fas fa-search"></i>
+                        <span>Search Items</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link" data-page="profile">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+
+
+                <li class="sidebar-item mt-4">
+                    <a href="#" class="sidebar-link text-danger" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+
+
+
+
+
+            </ul>
+        </div>
+        <!--mange user page-->
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="topbar">
+                <div class="logo d-lg-none">Lost & Found System</div>
+                <div class="user-profile">
+                    <div class="user-avatar">DK</div>
+                    <div class="user-info d-none d-lg-block">
+                        <div class="fw-bold">Darshak Khedekar</div>
+                        <div class="text-muted small">darshakkhedekar@gamil.com</div>
+                    </div>
+                    <button class="sidebar-toggle d-lg-none ms-2" id="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <h1 class="page-title"><i class="fas fa-home"></i> Dashboard</h1>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+
+                        <div class="stat-icon found">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM FOUND</div>
+                        <div class="stat-value" id="total-found-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon lost">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM LOSS</div>
+                        <div class="stat-value" id="total-lost-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon returned">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM RETURNED</div>
+                        <div class="stat-value">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon unclaimed">
+                            <i class="fas fa-boxes-stacked"></i>
+                        </div>
+                        <div class="stat-title">UNCLAIMED ITEMS</div>
+                        <div class="stat-value">0</div>
+                    </div>
+
+                </div>
+
+                <div class="user-only">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="form-section">
+                                <h2 class="form-title"><i class="fas fa-plus-circle me-2"></i>Quick Report Lost Item
+                                </h2>
+
+                                <form id="quick-lost-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Item Name</label>
+                                        <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone"
+                                            required id="quick-lost-name">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location Lost</label>
+                                        <input type="text" class="form-control" id="quick-lost-location"
+                                            placeholder="e.g., Library, Cafeteria, Main Building" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" rows="3" id="quick-lost-description"
+                                            placeholder="Brief description of the item"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Report Lost Item</button>
+                                </form>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="form-section">
+                                <h2 class="form-title"><i class="fas fa-plus-square me-2"></i>Quick Report Found Item
+                                </h2>
+
+                                <form id="quick-found-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Item Name</label>
+                                        <input type="text" class="form-control" id="quick-found-name"
+                                            placeholder="e.g., Backpack, Water Bottle, ID Card" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Location Found</label>
+                                        <input type="text" class="form-control" id="quick-found-location"
+                                            placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" rows="3" id="quick-found-description"
+                                            placeholder="Brief description of the item"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Report Found Item</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="user-only">
+                    <div class="form-section">
+                        <h2 class="form-title"><i class="fas fa-list me-2"></i>Recent Reports</h2>
+                        <div class="row" id="recent-lost-items-container">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Report Lost Item Page -->
+            <div id="report-lost-page" class="page-content hidden">
+                <h1 class="page-title">
+                    <i class="fas fa-plus-circle">
+
+                    </i> Report Lost Item
+                </h1>
+                <div class="form-section">
+                    <form id="lost-item-form">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Item Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="e.g., Wallet, Keys, Phone" required
+                                    id="lost-item-name">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" required id="lost-category">
+                                    <option value="">Select category</option>
+                                    <option>Electronics</option>
+                                    <option>Accessories</option>
+                                    <option>Documents</option>
+                                    <option>Clothing</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date Lost <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" required id="lost-date">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Lost <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control"
+                                    placeholder="e.g., Library, Cafeteria, Main Building" required id="lost-location">
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4"
+                                    placeholder="Detailed description of the item including color, brand, distinguishing features, etc."
+                                    required id="lost-description"></textarea>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Item Image</label>
+                                <input type="file" class="form-control" id="lostItemImage" accept="image/*">
+                                <div class="form-text">Upload a clear photo of the item if available</div>
+                                <div class="image-preview-container">
+                                    <img id="lostImagePreview" class="image-preview" alt="Item preview">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                            <button type="button" class="btn btn-outline-secondary"
+                                id="cancel-lost-report">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Report Found Item Page -->
+            <div id="report-found-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-plus-square"></i> Report Found Item</h1>
+                <div class="form-section">
+                    <form id="found-item-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label">Item Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="found-item-name"
+                                    placeholder="e.g., Backpack, Water Bottle, ID Card" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" required id="found-category">
+                                    <option value="">Select category</option>
+                                    <option>Electronics</option>
+                                    <option>Accessories</option>
+                                    <option>Documents</option>
+                                    <option>Clothing</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date Found <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" required id="found-date">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location Found <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="found-location"
+                                    placeholder="e.g., Classroom 205, Gym, Parking Lot" required>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" rows="4" id="found-description"
+                                    placeholder="Detailed description of the item including color, brand, distinguishing features, etc."
+                                    required></textarea>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Item Image</label>
+                                <input type="file" class="form-control" accept="image/*" id="foundItemImage">
+                                <div class="form-text">Upload a clear photo of the item</div>
+                                <div class="image-preview-container">
+                                    <img id="foundImagePreview" class="image-preview" alt="Item preview">
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="contactInfoCheck" required>
+                                    <label class="form-check-label" for="contactInfoCheck">
+                                        I agree to provide my contact information for verification purposes
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                            <button type="button" class="btn btn-outline-secondary"
+                                id="cancel-found-report">Cancel</button>
+                            <button type="submit" class="btn btn-success">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Items Page -->
+            <div id="search-items-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-search"></i> Search Lost & Found Items</h1>
+
+                <div class="search-container">
+                    <div class="mb-4">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput"
+                                placeholder="Search by item name, description, location...">
+                            <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                        </div>
+                    </div>
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option>All Categories</option>
+                                <option>Electronics</option>
+                                <option>Accessories</option>
+                                <option>Documents</option>
+                                <option>Clothing</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="filter-group" id="status-filter-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="statusFilter">
+                                <option>All Statuses</option>
+                                <option>Lost</option>
+                                <option>Found</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="form-label">Date Range</label>
+                            <select class="form-select" id="dateFilter">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 3 months</option>
+                                <option>All time</option>
+                            </select>
+                        </div>
+                        <div class="filter-group d-flex align-items-end">
+                            <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                                <i class="fas fa-redo me-1"></i> Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="form-title mb-4">Search Results</h2>
+                    <div class="row" id="searchResults">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page-content hidden">
+                <h1 class="page-title"><i class="fas fa-user"></i> My Profile</h1>
+
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">DK</div>
+                    <h2 class="profile-name" id="profile-name">Darshak Khedekar</h2>
+                    <p class="profile-email" id="profile-email">darshak.khedekar@gamil.com</p>
+                    <span class="badge bg-primary" id="profile-role-badge">Student</span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-section">
+                            <h2 class="form-title"><i class="fas fa-user-edit me-2"></i>Personal Information</h2>
+                            <form id="profile-form">
+                                <div class="row">
+
+                                    <div id="student-fields">
+
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">First Name</label>
+                                                <input type="text" id="profile-firstname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Last Name</label>
+                                                <input type="text" id="profile-lastname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Email Address</label>
+                                                <input type="email" id="profile-email-input" class="form-control"
+                                                    required>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Phone Number</label>
+                                                <input type="tel" id="profile-phone" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Student ID</label>
+                                                <input type="text" id="profile-studentid" class="form-control" disabled>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Department</label>
+                                                <input type="text" id="profile-department" class="form-control"
+                                                    disabled>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="admin-fields" class="hidden">
+
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Full Name</label>
+                                                <input type="text" id="admin-fullname" class="form-control">
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Role</label>
+                                                <input type="text" id="admin-role" class="form-control"
+                                                    value="Administrator" disabled>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                                <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="form-section mt-4">
+                            <h2 class="form-title"><i class="fas fa-key me-2"></i>Change Password</h2>
+                            <form id="password-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="current-password" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="new-password" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+                                </div>
+                                <div class="d-grid d-md-flex justify-content-md-end gap-3">
+                                    <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Change Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                        <div class="form-section mt-4">
+                            <h2 class="form-title"><i class="fas fa-history me-2"></i>Recent Activity</h2>
+
+                            <ul class="list-group list-group-flush" id="recent-activity-list">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+            <!-- Admin Panel Page -->
+            <div id="manage-users-page" class="page-content hidden">
+                <h1 class="page-title">
+                    <i class="fas fa-users"></i> Manage Users
+                </h1>
+
+                <div class="stats-container">
+
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-title">TOTAL USERS</div>
+                        <div class="stat-value" id="total-users">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-title">TOTAL STUDENTS</div>
+                        <div class="stat-value" id="total-students">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ADMIN</div>
+                        <div class="stat-value" id="total-admins">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <div class="stat-title">BLOCKED</div>
+                        <div class="stat-value" id="total-blocked">0</div>
+                    </div>
+
+                </div>
+
+
+                <div class="admin-table-container">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h2 class="h5 mb-0">User Management</h2>
+                        <button type="button" class="btn btn-sm btn-primary" id="add-user-btn">
+                            <i class="fas fa-plus me-1"></i> Add User
+                        </button>
+                    </div>
+
+                    <div class="p-3 border-bottom">
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <input type="text" id="user-search" class="form-control"
+                                    placeholder="Search by Name, Email or Student ID">
+                            </div>
+
+                            <div class="col-md-3">
+                                <select id="role-filter" class="form-select">
+                                    <option value="all">All Roles</option>
+                                    <option value="user">Students</option>
+                                    <option value="admin">Admins</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <select id="status-filter" class="form-select">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="blocked">Blocked</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody id="users-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div id="report-management-page" class="page-content hidden">
+
+                <h1 class="page-title">
+
+                    <i class="fas fa-clipboard-list"></i>
+                    Report Management
+                </h1>
+                <div class="stats-container">
+                    <div class="stat-card">
+
+                        <div class="stat-icon found">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM FOUND</div>
+                        <div class="stat-value" id="admin-total-found-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon lost">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM LOSS</div>
+                        <div class="stat-value" id="admin-total-lost-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon returned">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-title">TOTAL ITEM RETURNED</div>
+                        <div class="stat-value" id="returned-items">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon unclaimed">
+                            <i class="fas fa-boxes-stacked"></i>
+                        </div>
+                        <div class="stat-title">UNCLAIMED ITEMS</div>
+                        <div class="stat-value" id="admin-unclaimed-items">0</div>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+                <div class="admin-table-container">
+
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+
+                        <h2 class="h5 mb-0">
+                            Report Management
+                        </h2>
+
+                    </div>
+                    <div class="p-3 border-bottom">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <input type="text" id="report-search" class="form-control"
+                                    placeholder="Search Item, Reporter or Student ID">
+                            </div>
+
+                            <div class="col-md-3">
+                                <select id="report-type-filter" class="form-select">
+                                    <option value="all">All Types</option>
+                                    <option value="lost">Lost</option>
+                                    <option value="found">Found</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-5">
+                                <select id="report-status-filter" class="form-select">
+                                    <option value="all">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="returned">Returned</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="table-responsive">
+
+                        <table class="table table-hover mb-0">
+
+                            <thead>
+                                <tr>
+
+                                    <th>Reporter name</th>
+
+                                    <th>Type</th>
+
+                                    <th>Item Name</th>
+
+                                    <th>Category</th>
+
+                                    <th>Status</th>
+
+                                    <th>Report Date</th>
+
+                                    <th>Actions</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody id="reports-table-body">
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+            </div>
+            <div id="potential-matches-page" class="page-content hidden">
+
+                <h1 class="page-title">
+
+                    <i class="fas fa-link"></i>
+                    Potential Matches
+
+                </h1>
+
+                <div class="admin-table-container">
+
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+
+                        <h2 class="h5 mb-0">
+                            Potential Item Matches
+                        </h2>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover mb-0">
+
+                            <thead>
+                                <tr>
+
+                                    <th>Lost Item</th>
+
+                                    <th>Found Item</th>
+
+                                    <th>Match Score</th>
+
+                                    <th>Match Level</th>
+
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody id="matches-table-body">
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                    <div class="admin-table-container mt-4">
+
+                        <div class="p-3 border-bottom">
+
+                            <h2 class="h5 mb-0">
+                                Matching History
+                            </h2>
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover mb-0">
+
+                                <thead>
+                                    <tr>
+
+                                        <th>Lost Item</th>
+
+                                        <th>Found Item</th>
+
+                                        <th>Status</th>
+
+                                        <th>Date</th>
+
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody id="match-history-table-body">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Match Information Modal -->
+    <div class="modal fade" id="matchInformationModal" tabindex="-1">
+
+        <div class="modal-dialog modal-xl">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Potential Match Information
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- Lost Item -->
+                    <div class="mb-4">
+
+                        <h5 class="mb-3">
+                            Lost Item
+                        </h5>
+
+                        <div class="border rounded p-3">
+
+                            <p>
+                                <strong>Item Name:</strong>
+                                <span id="match-lost-item"></span>
+                            </p>
+
+                            <p>
+                                <strong>Category:</strong>
+                                <span id="match-lost-category"></span>
+                            </p>
+
+                            <p>
+                                <strong>Date Lost:</strong>
+                                <span id="match-lost-date"></span>
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                <span id="match-lost-location"></span>
+                            </p>
+
+                            <p>
+                                <strong>Description:</strong>
+                            </p>
+
+                            <div class="border rounded p-3 mb-3">
+                                <span id="match-lost-description"></span>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <img id="match-lost-image" class="img-fluid rounded shadow"
+                                    style="max-height: 300px; display: none;" alt="Lost item image">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Lost Reporter -->
+                    <div class="mb-4">
+
+                        <h5 class="mb-3">
+                            Lost Item Reporter
+                        </h5>
+
+                        <div class="border rounded p-3">
+
+                            <p>
+                                <strong>Name:</strong>
+                                <span id="match-lost-reporter-name"></span>
+                            </p>
+
+                            <p>
+                                <strong>Student ID:</strong>
+                                <span id="match-lost-reporter-studentid"></span>
+                            </p>
+
+                            <p>
+                                <strong>Department:</strong>
+                                <span id="match-lost-reporter-department"></span>
+                            </p>
+
+                            <p>
+                                <strong>Phone:</strong>
+                                <span id="match-lost-reporter-phone"></span>
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong>
+                                <span id="match-lost-reporter-email"></span>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Found Item -->
+                    <div class="mb-4">
+
+                        <h5 class="mb-3">
+                            Found Item
+                        </h5>
+
+                        <div class="border rounded p-3">
+
+                            <p>
+                                <strong>Item Name:</strong>
+                                <span id="match-found-item"></span>
+                            </p>
+
+                            <p>
+                                <strong>Category:</strong>
+                                <span id="match-found-category"></span>
+                            </p>
+
+                            <p>
+                                <strong>Date Found:</strong>
+                                <span id="match-found-date"></span>
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                <span id="match-found-location"></span>
+                            </p>
+
+                            <p>
+                                <strong>Description:</strong>
+                            </p>
+
+                            <div class="border rounded p-3 mb-3">
+                                <span id="match-found-description"></span>
+                            </div>
+                            <div class="text-center mt-3">
+                                <img id="match-found-image" class="img-fluid rounded shadow"
+                                    style="max-height: 300px; display: none;" alt="Found item image">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Found Reporter -->
+                    <div class="mb-4">
+
+                        <h5 class="mb-3">
+                            Found Item Reporter
+                        </h5>
+
+                        <div class="border rounded p-3">
+
+                            <p>
+                                <strong>Name:</strong>
+                                <span id="match-found-reporter-name"></span>
+                            </p>
+
+                            <p>
+                                <strong>Student ID:</strong>
+                                <span id="match-found-reporter-studentid"></span>
+                            </p>
+
+                            <p>
+                                <strong>Department:</strong>
+                                <span id="match-found-reporter-department"></span>
+                            </p>
+
+                            <p>
+                                <strong>Phone:</strong>
+                                <span id="match-found-reporter-phone"></span>
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong>
+                                <span id="match-found-reporter-email"></span>
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirmMatchBtn">
+                        Confirm Match
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal fade" id="userDetailsModal" tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-circle me-2"></i>
+                        User Details
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Full Name</strong>
+                            <p id="view-fullname"></p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Email</strong>
+                            <p id="view-email"></p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Phone</strong>
+                            <p id="view-phone"></p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Student ID</strong>
+                            <p id="view-studentid"></p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Department</strong>
+                            <p id="view-department"></p>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <strong>Role</strong>
+                            <p id="view-role"></p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Close
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-edit me-2"></i>
+                        Edit User
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="edit-user-id">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Full Name
+                            </label>
+
+                            <input type="text" id="edit-fullname" class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input type="email" id="edit-email" class="form-control" readonly>
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Student ID
+                            </label>
+
+                            <input type="text" id="edit-studentid" class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Phone Number
+                            </label>
+
+                            <input type="text" id="edit-phone" class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Department
+                            </label>
+
+                            <input type="text" id="edit-department" class="form-control">
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Role
+                            </label>
+
+                            <select id="edit-role" class="form-select">
+
+                                <option value="user">Student</option>
+
+                                <option value="admin">Administrator</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button type="button" class="btn btn-primary" id="save-edit-user-btn">
+
+                        <i class="fas fa-save me-2"></i>
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Block User Modal -->
+    <div class="modal fade" id="blockUserModal" tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        <i class="fas fa-ban text-danger me-2"></i>
+                        Block User
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="block-user-id">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Reason
+                        </label>
+
+                        <select id="block-reason" class="form-select">
+
+                            <option value="">Select Reason</option>
+
+                            <option>Fake Reports</option>
+
+                            <option>Spam Activity</option>
+
+                            <option>Misuse of Platform</option>
+
+                            <option>Duplicate Account</option>
+
+                            <option>Other</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Additional Note
+                        </label>
+
+                        <textarea id="block-note" class="form-control" rows="3"
+                            placeholder="Write additional note..."></textarea>
+
+                    </div>
+
+                    <div class="form-check">
+
+                        <input class="form-check-input" type="checkbox" id="send-email" checked>
+
+                        <label class="form-check-label">
+
+                            Send Email Notification
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button class="btn btn-danger" id="confirm-block-btn">
+
+                        <i class="fas fa-ban me-2"></i>
+
+                        Block User
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!----view report model-->
+    <div class="modal fade" id="viewReportModal" tabindex="-1">
+
+        <div class="modal-dialog modal-lg">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Report Details
+                    </h5>
+
+                    <button class="btn-close" data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p><strong>Item Name:</strong> <span id="report-item-name"></span></p>
+
+                            <p><strong>Category:</strong> <span id="report-category"></span></p>
+
+                            <p><strong>Type:</strong> <span id="report-type"></span></p>
+
+                            <p><strong>Status:</strong> <span id="report-status"></span></p>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p><strong>Reporter:</strong> <span id="report-user"></span></p>
+
+                            <p><strong>Student ID:</strong> <span id="report-studentid"></span></p>
+
+                            <p><strong>Department:</strong> <span id="report-department"></span></p>
+
+                            <p><strong>Phone:</strong> <span id="report-phone"></span></p>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <p>
+
+                        <strong>Location:</strong>
+
+                        <span id="report-location"></span>
+
+                    </p>
+
+                    <p>
+
+                        <strong>Date:</strong>
+
+                        <span id="report-date"></span>
+
+                    </p>
+
+                    <p>
+
+                        <strong>Description:</strong>
+
+                    </p>
+
+                    <div class="border rounded p-3">
+
+                        <span id="report-description"></span>
+
+                    </div>
+
+                    <div class="text-center mt-4">
+
+                        <img id="report-image" class="img-fluid rounded shadow" style="max-height:300px; display:none;">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+    <!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1"
+    aria-labelledby="addUserModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Add New User
+                </h5>
+
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <form id="add-user-form">
+
+                    <!-- Select User Role -->
+                    <div class="mb-3">
+                        <label for="new-user-role" class="form-label">
+                            User Type
+                        </label>
+
+                        <select class="form-select" id="new-user-role" required>
+                            <option value="">Select user type</option>
+                            <option value="student">Student</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+
+                    <!-- Student First and Last Name -->
+                    <div class="row" id="student-name-fields">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="new-user-firstname" class="form-label">
+                                First Name
+                            </label>
+
+                            <input type="text" class="form-control"
+                                id="new-user-firstname"
+                                placeholder="Enter first name">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="new-user-lastname" class="form-label">
+                                Last Name
+                            </label>
+
+                            <input type="text" class="form-control"
+                                id="new-user-lastname"
+                                placeholder="Enter last name">
+                        </div>
+
+                    </div>
+
+                    <!-- Administrator Full Name -->
+                    <div class="mb-3 hidden" id="admin-name-field">
+                        <label for="new-user-fullname" class="form-label">
+                            Full Name
+                        </label>
+
+                        <input type="text" class="form-control"
+                            id="new-user-fullname"
+                            placeholder="Enter full name">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="new-user-email" class="form-label">
+                            Email Address
+                        </label>
+
+                        <input type="email" class="form-control"
+                            id="new-user-email"
+                            placeholder="Enter email address" required>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="new-user-phone" class="form-label">
+                            Phone Number
+                        </label>
+
+                        <input type="tel" class="form-control"
+                            id="new-user-phone"
+                            placeholder="Enter phone number" required>
+                    </div>
+
+                    <!-- Student ID -->
+                    <div class="mb-3" id="student-id-field">
+                        <label for="new-user-studentid" class="form-label">
+                            Student ID
+                        </label>
+
+                        <input type="text" class="form-control"
+                            id="new-user-studentid"
+                            placeholder="Enter student ID">
+                    </div>
+
+                    <!-- Department -->
+                    <div class="mb-3" id="student-department-field">
+                        <label for="new-user-department" class="form-label">
+                            Department
+                        </label>
+
+                        <input type="text" class="form-control"
+                            id="new-user-department"
+                            placeholder="Enter department">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="new-user-password" class="form-label">
+                            Password
+                        </label>
+
+                        <input type="password" class="form-control"
+                            id="new-user-password"
+                            placeholder="Create password"
+                            minlength="8" required>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-3">
+                        <label for="new-user-confirm-password"
+                            class="form-label">
+                            Confirm Password
+                        </label>
+
+                        <input type="password" class="form-control"
+                            id="new-user-confirm-password"
+                            placeholder="Confirm password"
+                            minlength="8" required>
+                    </div>
+
+                    <!-- Message -->
+                    <div id="add-user-message" class="alert hidden"
+                        role="alert"></div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="btn btn-primary"
+                            id="create-user-btn">
+                            <i class="fas fa-user-plus me-1"></i>
+                            Create User
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Add User Modal -->
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="backed.js"></script>
+
+</html>
