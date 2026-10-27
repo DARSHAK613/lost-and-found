@@ -85,7 +85,8 @@ CORS(
         r"/*": {
             "origins": [
                 "https://dreamy-monstera-2a025a.netlify.app",
-                "https://lostandfoundsysteam.netlify.app"
+                "https://lostandfoundsysteam.netlify.app",
+                "https://lostandfoundgpm.netlify.app"
             ]
         }
     },
