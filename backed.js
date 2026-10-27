@@ -225,11 +225,38 @@ document.addEventListener('DOMContentLoaded', function () {
         if (clickedLink) {
             clickedLink.classList.add('active');
         }
+        if (window.innerWidth <= 992) {
+            sidebar.classList.remove("active");
+            mobileMenuToggle.setAttribute("aria-expanded", "false");
+        }
         loadTotalFoundItems();
         loadTotalLostItems();
         loadTotalReturnedItems();
         loadTotalUnclaimedItems();
     }
+
+    sidebarToggle.addEventListener("click", () => {
+        if (window.innerWidth <= 992) {
+            sidebar.classList.remove("active");
+            mobileMenuToggle.setAttribute("aria-expanded", "false");
+            return;
+        }
+
+        const isCollapsed = sidebar.classList.toggle("collapsed");
+        sidebarToggle.setAttribute("aria-expanded", String(!isCollapsed));
+        sidebarToggle.setAttribute("aria-label", isCollapsed ? "Expand sidebar" : "Collapse sidebar");
+        sidebarToggle.querySelector("i").classList.toggle("fa-chevron-left", !isCollapsed);
+        sidebarToggle.querySelector("i").classList.toggle("fa-chevron-right", isCollapsed);
+    });
+
+    mobileMenuToggle.addEventListener("click", () => {
+        const isOpening = !sidebar.classList.contains("active");
+        if (isOpening) {
+            sidebar.classList.remove("collapsed");
+        }
+        sidebar.classList.toggle("active", isOpening);
+        mobileMenuToggle.setAttribute("aria-expanded", String(isOpening));
+    });
 
 
 

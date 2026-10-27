@@ -97,7 +97,7 @@ body {
     position: fixed;
     height: 100vh;
     z-index: 1000;
-    transition: all var(--transition-speed) ease;
+    transition: width var(--transition-speed) ease, transform var(--transition-speed) ease;
     overflow-y: auto;
 }
 
@@ -126,6 +126,23 @@ body {
     font-size: 1.8rem;
 }
 
+.sidebar-brand .brand-name {
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width var(--transition-speed) ease, opacity var(--transition-speed) ease;
+}
+
+.sidebar.collapsed .sidebar-header {
+    justify-content: center;
+    padding: 16px 8px;
+}
+
+.sidebar.collapsed .sidebar-brand {
+    display: none;
+}
+
 .sidebar-menu {
     padding: 20px 0;
     list-style: none;
@@ -134,6 +151,10 @@ body {
 .sidebar-item {
     padding: 0 20px;
     margin-bottom: 5px;
+}
+
+.sidebar.collapsed .sidebar-item {
+    padding: 0 10px;
 }
 
 .sidebar-link {
@@ -146,6 +167,12 @@ body {
     margin: 2px 0;
     transition: all 0.3s;
     font-weight: 500;
+}
+
+.sidebar.collapsed .sidebar-link {
+    justify-content: center;
+    padding-right: 8px;
+    padding-left: 8px;
 }
 
 .sidebar-link:hover,
@@ -163,12 +190,16 @@ body {
 }
 
 .sidebar-link span {
-    transition: opacity 0.3s;
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width var(--transition-speed) ease, opacity var(--transition-speed) ease;
 }
 
 .sidebar.collapsed .sidebar-link span {
     opacity: 0;
-    display: none;
+    max-width: 0;
 }
 
 .sidebar.collapsed .sidebar-link i {
