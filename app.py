@@ -886,7 +886,7 @@ def recent_lost_items():
 
     items = []
 
-    for item in lost_items.find({"status": "Approved"}).sort("_id", -1):
+    for item in lost_items.find({"status": {"$in": ["Approved", "Pending"]}}).sort("_id", -1):
 
         items.append({
 
